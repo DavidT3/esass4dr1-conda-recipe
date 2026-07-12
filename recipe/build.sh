@@ -110,11 +110,12 @@ cd $SRC_DIR/eSASS/autoconf
 echo "Running autoreconf..."
 autoreconf -fi -v
 
-export ESASS_INSTALL_DIR=$PREFIX/esass
+export ESASS_BUILD_DIR_NAME=esass
+#export ESASS_INSTALL_DIR=$PREFIX/esass
 
 echo "Configuring eSASS..."
 ./configure \
-    --prefix=$ESASS_INSTALL_DIR \
+    --prefix=$ESASS_BUILD_DIR_NAME \
     --with-healpix=$HEALPIX_DIR \
     --with-headas=$HEADAS \
     --with-gsl=system \
@@ -126,18 +127,14 @@ echo "Configuring eSASS..."
     FFLAGS="-I$PREFIX/include" \
     FCFLAGS="-I$PREFIX/include"
 
-echo "Starting eSASS build (sequential)..."
+echo "Starting eSASS build..."
 make
 
 echo "Installing eSASS..."
 make install
 
-echo "Symlinking binaries to top-level bin directory..."
-mkdir -p $PREFIX/bin
-for f in $PREFIX/esass/bin/*; do
-    # We use relative symlinks for portability within the Conda prefix
-    ln -s ../esass/bin/$(basename $f) $PREFIX/bin/$(basename $f)
-done
+echo "Moving built eSASS to host directory..."
+mv $ESASS_INSTALL_DIR $PREFIX
 
 echo ""
 echo "================================================================"
@@ -153,12 +150,13 @@ cat <<EOF > $PREFIX/etc/conda/activate.d/esass_activate.sh
 #!/bin/bash
 
 # Point to the new eSASS subdirectory
-export ESASS_DIR=\$PREFIX/esass
+export ESASS_DIR=\$CONDA_PREFIX/$ESASS_BUILD_DIR_NAME
 if [ -f "\$ESASS_DIR/bin/esass-init.sh" ]; then
     # Ensure SASS_ROOT points to the internal esass folder
     export SASS_ROOT=\$ESASS_DIR
     source "\$ESASS_DIR/bin/esass-init.sh"
 fi
+echo "Activating eSASS in $ESASS_DIR"
 EOF
 
 echo "Writing deactivation script..."
