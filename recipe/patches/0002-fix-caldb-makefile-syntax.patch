@@ -1,0 +1,47 @@
+--- eSASS/autoconf/setup/Makefile.am
++++ eSASS/autoconf/setup/Makefile.am
+@@ -22,11 +22,10 @@
+ 	echo 'export CALDBALIAS=$$CALDB/software/tools/alias_config.fits' >> $@
+ 	echo 'export SASS_CALVERS=$$CALDB/data/erosita/calvers.indx' >> $@
+ else
+-  	echo "# CALDB not configured at compiletime" >> $@
++	echo "# CALDB not configured at compiletime" >> $@
+ endif
+ #	#echo 'export PS1="@PACKAGE_VERSION@ # "' >> $@
+ #	#echo "export ESASSRELEASE=@RELEASENAME@">> $@
+-	cp $(prefix)/erosita/task/*/*.html $(prefix)/doc/
+
+ esass-init.zsh: esass-init.zsh.in
+ 	$(SED) -e 's,[@]prefix[@],$(prefix),g' < $< > $@
+@@ -44,7 +43,7 @@
+ 	echo 'export CALDBALIAS=$$CALDB/software/tools/alias_config.fits' >> $@
+ 	echo 'export SASS_CALVERS=$$CALDB/data/erosita/calvers.indx' >> $@
+ else
+-  	echo "# CALDB not configured at compiletime" >> $@
++	echo "# CALDB not configured at compiletime" >> $@
+ endif
+
+
+@@ -64,15 +63,18 @@
+ 	echo 'setenv CALDBALIAS $$CALDB/software/tools/alias_config.fits' >> $@
+ 	echo 'setenv SASS_CALVERS $$CALDB/data/erosita/calvers.indx' >> $@
+ else
+-  	echo "# CALDB not configured at compiletime" >> $@
++	echo "# CALDB not configured at compiletime" >> $@
+ endif
+ #	#echo 'set prompt="@PACKAGE_VERSION@ # "' >> $@
+ #	#echo "setenv ESASSRELEASE @RELEASENAME@">> $@
+
+ ebarycen:
+-	mkdir -p $(prefix)/bin/
+-	cp $(prefix)/erosita/task/ebarycen/ebarycen $(prefix)/bin/
+-	chmod ugo+x $(prefix)/bin/ebarycen
++	cp $(top_srcdir)/../erosita/task/ebarycen/ebarycen .
++	chmod ugo+x ebarycen
+
+-#install: esass-init.sh esass-init.zsh esass-init.csh ebaryc
++install-data-hook:
++	mkdir -p $(DESTDIR)$(prefix)/doc
++	if [ -d $(top_srcdir)/../erosita/task ]; then \
++	    cp $(top_srcdir)/../erosita/task/*/*.html $(DESTDIR)$(prefix)/doc/; \
++	fi

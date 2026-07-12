@@ -1,0 +1,35 @@
+--- eSASS/autoconf/configure.ac
++++ eSASS/autoconf/configure.ac
+@@ -33,12 +33,12 @@
+                if test `file /tmp/hdctest.o | grep -ci 'x86_64'` -ne 0; then
+                   { AC_MSG_NOTICE([ compiler produces  x86_64 binaries ])
+                    #TODO for next release :  declare a recursive path in the LDFLAG
+-                   MACFLAGS="-L/usr/local/lib/ -L/usr/local/Cellar/ncurses/6.4/lib/ -L/usr/local/Cellar/readline/8.2.1/lib/  -L/usr/local/lib -I/usr/local/include/  -arch x86_64"
++                   MACFLAGS="-arch x86_64"
+                   }
+                elif test `file /tmp/hdctest.o | grep -ci 'arm64'` -ne 0; then
+ 		          {
+ 		           AC_MSG_NOTICE([ compiler produces native arm64 binaries ])
+-	               MACFLAGS="-L/opt/homebrew/lib/  -L/opt/homebrew/Cellar/readline/8.2.1/lib/ -L/opt/homebrew/Cellar/ncurses/6.4/lib/ -L/opt/local/lib -L/usr/local/lib -I/usr/local/include/ -I/opt/local/include"
++	               MACFLAGS=""
+                   }
+                else
+                   {
+@@ -50,7 +50,7 @@
+             x86*)
+                # cpu x86 =>search in brew+port standard intel only 2 path
+                AC_MSG_NOTICE([ found X86 CPU ])
+-               MACFLAGS="-L/usr/local/Cellar/ncurses/6.4/lib/ -L/usr/local/Cellar/readline/8.2.1/lib/ -L/opt/local/lib -L/usr/local/lib -I/usr/local/include/ -I/opt/local/include -arch x86_64"
++               MACFLAGS="-arch x86_64"
+                ;;
+             *)
+                AC_MSG_ERROR([" CPU architecture ${host_cpu} unsupported "])
+@@ -114,7 +114,7 @@
+         ;;
+     darwin*)
+         #macosx version
+-        FORTRANOPTIONS="-O3 -static-libgfortran -fdollar-ok -fall-intrinsics -std=gnu -fno-automatic -fcheck=bounds -fcheck=do -fcheck=mem -fcheck=pointer -frange-check -ffixed-line-length-none -ffree-line-length-none  "
++        FORTRANOPTIONS="-O3 -fdollar-ok -fall-intrinsics -std=gnu -fno-automatic -fcheck=bounds -fcheck=do -fcheck=mem -fcheck=pointer -frange-check -ffixed-line-length-none -ffree-line-length-none  "
+         ;;
+     *)
+         AC_MSG_ERROR(["OS $host_os is not supported"])

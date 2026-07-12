@@ -1,0 +1,70 @@
+# Recipe for eROSITA's eSASSDR1 software
+context:
+  name: eSASS4DR1
+  version: 1.0.2
+
+package:
+  name: ${{ name|lower }}
+  version: ${{ version }}
+
+source:
+  url: https://erosita.mpe.mpg.de/dr1/eSASS4DR1/eSASS4DR1_installation/eSASS4DR${{ version }}.tgz
+  sha256: c49242c0ddd6f8659c082db8af8bbc818c6bde64b905f80b9e317ca0bc79a8d9
+  patches:
+    - patches/0001-fix-macos-paths-and-static-linking.patch
+    - patches/0002-fix-caldb-makefile-syntax.patch
+
+build:
+  number: 0
+  script: build.sh
+  skip:
+    - win
+
+requirements:
+  build:
+    - ${{ compiler('c') }}
+    - ${{ compiler('cxx') }}
+    - ${{ compiler('fortran') }}
+    - autoconf
+    - automake
+    - libtool
+    - make
+    - pkg-config
+  host:
+    - heasoft  # From the HEASARC channel
+    - fftw
+    - gsl
+    - readline
+    - ncurses
+    - libpng
+    - libcurl
+    - if: linux
+      then:
+        - libgomp
+    - if: osx
+      then:
+        - llvm-openmp
+  run:
+    - heasoft
+    - fftw
+    - gsl
+    - if: linux
+      then:
+        - libgomp
+    - if: osx
+      then:
+        - llvm-openmp
+    - python >=3.8
+    - astropy
+
+about:
+  homepage: https://erosita.mpe.mpg.de/dr1/eSASS4DR1/
+  license: GPL-2.0-or-later
+  license_file:
+    - COPYING
+    - external/Healpix_3.50/READ_Copyrights_Licenses.txt
+  documentation: https://erosita.mpe.mpg.de/dr1/eSASS4DR1/
+  summary: "eROSITA Science Analysis Software System for DR1"
+  description: |
+    A packaged version of eROSITA's eSASS4DR1 software. Depends on HEASoft, installed
+    from the HEASARC channel.
