@@ -13,6 +13,7 @@ source:
   patches:
     - patches/0001-fix-macos-paths-and-static-linking.patch
     - patches/0002-fix-caldb-makefile-syntax.patch
+    - patches/0003-remove-headas-init-from-esass-init.patch
 
 build:
   number: 0
