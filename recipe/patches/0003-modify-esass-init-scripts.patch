@@ -52,6 +52,7 @@
 
  setenv PATH $SASS_ROOT/bin:$PATH
 
++# Patched in during Conda package build
 +if ( ! $?CALDB ) then
 +    echo "WARNING: The CALDB environment variable is not set."
 +    echo "Please set CALDB to your calibration database path. For example:"
@@ -88,6 +89,7 @@
    export PATH=$SASS_ROOT/bin:$PATH
    #ulimit -s 32768
 
++  # Patched in during Conda package build
 +  if [ -z "$CALDB" ]; then
 +      echo "WARNING: The CALDB environment variable is not set."
 +      echo "Please set CALDB to your calibration database path. For example:"
