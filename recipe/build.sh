@@ -175,7 +175,7 @@ mkdir -p $PREFIX/etc/conda/activate.d
 mkdir -p $PREFIX/etc/conda/deactivate.d
 
 echo "Writing activation scripts..."
-cat <<EOF > $PREFIX/etc/conda/activate.d/esass_activate.sh
+cat <<EOF > $PREFIX/etc/conda/activate.d/post_heasoft_esass_activate.sh
 #!/bin/bash
 
 # Point to the eSASS4DR1/eSASS subdirectory
@@ -195,7 +195,7 @@ fi
 echo "Activating eSASS in \$ESASS_DIR"
 EOF
 
-cat <<EOF > $PREFIX/etc/conda/activate.d/esass_activate.csh
+cat <<EOF > $PREFIX/etc/conda/activate.d/post_heasoft_esass_activate.csh
 #!/bin/csh
 
 # Point to the eSASS4DR1/eSASS subdirectory
