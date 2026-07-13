@@ -174,19 +174,42 @@ echo ""
 mkdir -p $PREFIX/etc/conda/activate.d
 mkdir -p $PREFIX/etc/conda/deactivate.d
 
-echo "Writing activation script..."
+echo "Writing activation scripts..."
 cat <<EOF > $PREFIX/etc/conda/activate.d/esass_activate.sh
 #!/bin/bash
 
-# Point to the new eSASS subdirectory
-export ESASS_DIR=\$CONDA_PREFIX/eSASS
-if [ -f "\$ESASS_DIR/bin/esass-init.sh" ]; then
-    # Ensure SASS_ROOT points to the internal esass folder
-    export SASS_ROOT=\$ESASS_DIR
+# Point to the eSASS4DR1/eSASS subdirectory
+export ESASS_DIR=\$CONDA_PREFIX/eSASS4DR1/eSASS
+
+# Ensure SASS_ROOT points to the internal esass folder
+#export SASS_ROOT=\$ESASS_DIR
+
+# Check if the user is running Zsh
+if [ -n "$ZSH_VERSION" ]; then
+    source "\$ESASS_DIR/bin/esass-init.zsh"
+# Otherwise, default to the Bash script
+else
     source "\$ESASS_DIR/bin/esass-init.sh"
 fi
+
 echo "Activating eSASS in \$ESASS_DIR"
 EOF
+
+cat <<EOF > $PREFIX/etc/conda/activate.d/esass_activate.csh
+#!/bin/csh
+
+# Point to the eSASS4DR1/eSASS subdirectory
+setenv ESASS_DIR \$CONDA_PREFIX/eSASS4DR1/eSASS
+
+# Ensure SASS_ROOT points to the internal esass folder
+#setenv SASS_ROOT \$ESASS_DIR
+
+# Source the C shell init script
+source \$ESASS_DIR/bin/esass-init.csh
+
+echo "Activating eSASS in \$ESASS_DIR"
+EOF
+
 
 echo "Writing deactivation script..."
 cat <<EOF > $PREFIX/etc/conda/deactivate.d/esass_deactivate.sh
