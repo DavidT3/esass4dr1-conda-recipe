@@ -1,0 +1,109 @@
+--- eSASS/autoconf/setup/esass-init.sh.in
++++ eSASS/autoconf/setup/esass-init.sh.in	(date 1783875267070)
+@@ -2,8 +2,9 @@
+ # Setup script for eSASS environment
+ # This file has been automatically generated at eSASS compile time
+
+-export HEADAS=@HEASOFT@
+-source $HEADAS/headas-init.sh
++# Automatic HEADAS setting and HEASoft activation has been patched out of this
++#  Conda-packaged version of eSASS - it will be handled by the HEASoft Conda
++#  package activation scripts.
+
+ export SASS_ROOT=$(realpath $(dirname $BASH_SOURCE)/../)
+ export SASS_DIR=$SASS_ROOT
+
+@@ -38,3 +38,18 @@
+
+
+ # CALDB
++
++
++if [ -z "$CALDB" ]; then
++    echo "WARNING: The CALDB environment variable is not set."
++    echo "Please set CALDB to your calibration database path. For example:"
++    echo "  export CALDB=/path/to/caldb4DR1-esass"
++    echo "Once set, you will need to manually configure the following variables:"
++    echo "  export CALDBCONFIG=\$CALDB/software/tools/caldb.config"
++    echo "  export CALDBALIAS=\$CALDB/software/tools/alias_config.fits"
++    echo "  export SASS_CALVERS=\$CALDB/data/erosita/calvers.indx"
++else
++    export CALDBCONFIG=$CALDB/software/tools/caldb.config
++    export CALDBALIAS=$CALDB/software/tools/alias_config.fits
++    export SASS_CALVERS=$CALDB/data/erosita/calvers.indx
++fi
+\ No newline at end of file
+
+
+--- eSASS/autoconf/setup/esass-init.csh.in
++++ eSASS/autoconf/setup/esass-init.csh.in	(date 1783956980985)
+@@ -2,8 +2,9 @@
+ # Setup script for eSASS environment
+ # This file has been automatically generated at eSASS compiletime
+
+-setenv HEADAS @HEASOFT@
+-source $HEADAS/headas-init.csh
++# Automatic HEADAS setting and HEASoft activation has been patched out of this
++#  Conda-packaged version of eSASS - it will be handled by the HEASoft Conda
++#  package activation scripts.
+
+ setenv SASS_ROOT @prefix@
+ #setenv SASS_DIR $SASS_ROOT
+
+@@ -32,3 +32,18 @@
+ setenv PATH $SASS_ROOT/bin:$PATH
+
+ # CALDB
++
++
++if ( ! $?CALDB ) then
++    echo "WARNING: The CALDB environment variable is not set."
++    echo "Please set CALDB to your calibration database path. For example:"
++    echo "  setenv CALDB /path/to/caldb4DR1-esass"
++    echo "Once set, you will need to manually configure the following variables:"
++    echo "  setenv CALDBCONFIG \$CALDB/software/tools/caldb.config"
++    echo "  setenv CALDBALIAS \$CALDB/software/tools/alias_config.fits"
++    echo "  setenv SASS_CALVERS \$CALDB/data/erosita/calvers.indx"
++else
++    setenv CALDBCONFIG $CALDB/software/tools/caldb.config
++    setenv CALDBALIAS $CALDB/software/tools/alias_config.fits
++    setenv SASS_CALVERS $CALDB/data/erosita/calvers.indx
++endif
+
+
+--- eSASS/autoconf/setup/esass-init.zsh.in
++++ eSASS/autoconf/setup/esass-init.zsh.in	(date 1783957782537)
+@@ -2,8 +2,10 @@
+ # Setup script for eSASS environment
+ # This file has been automatically generated at eSASS compile time
+
+-export HEADAS=@HEASOFT@
+-source $HEADAS/headas-init.sh
++# Automatic HEADAS setting and HEASoft activation has been patched out of this
++#  Conda-packaged version of eSASS - it will be handled by the HEASoft Conda
++#  package activation scripts.
++
+ if [[ $SHELL != *"zsh"* ]];
+ then
+  echo " This script is for ZSH shell, you are running ${SHELL}"
+
+@@ -48,4 +48,19 @@
+
+
+   # CALDB
++
++
++  if [ -z "$CALDB" ]; then
++      echo "WARNING: The CALDB environment variable is not set."
++      echo "Please set CALDB to your calibration database path. For example:"
++      echo "  export CALDB=/path/to/caldb4DR1-esass"
++      echo "Once set, you will need to manually configure the following variables:"
++      echo "  export CALDBCONFIG=\$CALDB/software/tools/caldb.config"
++      echo "  export CALDBALIAS=\$CALDB/software/tools/alias_config.fits"
++      echo "  export SASS_CALVERS=\$CALDB/data/erosita/calvers.indx"
++  else
++      export CALDBCONFIG=$CALDB/software/tools/caldb.config
++      export CALDBALIAS=$CALDB/software/tools/alias_config.fits
++      export SASS_CALVERS=$CALDB/data/erosita/calvers.indx
++  fi
+ fi
