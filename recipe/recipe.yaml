@@ -58,6 +58,11 @@ requirements:
     - python >=3.8
     - astropy
 
+# The simplest test possible, just getting the version of one of the binaries.
+tests:
+  - script:
+      - srctool --version
+
 about:
   homepage: https://erosita.mpe.mpg.de/dr1/eSASS4DR1/
   license: GPL-2.0-or-later
