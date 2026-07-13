@@ -26,6 +26,10 @@
 +    echo "  export CALDBALIAS=\$CALDB/software/tools/alias_config.fits"
 +    echo "  export SASS_CALVERS=\$CALDB/data/erosita/calvers.indx"
 +else
++    if [ ! -d "$CALDB/data/erosita" ]; then
++        echo "WARNING: The directory $CALDB/data/erosita does not exist."
++        echo "Please ensure your CALDB is correctly installed and configured."
++    fi
 +    export CALDBCONFIG=$CALDB/software/tools/caldb.config
 +    export CALDBALIAS=$CALDB/software/tools/alias_config.fits
 +    export SASS_CALVERS=$CALDB/data/erosita/calvers.indx
@@ -62,6 +66,10 @@
 +    echo "  setenv CALDBALIAS \$CALDB/software/tools/alias_config.fits"
 +    echo "  setenv SASS_CALVERS \$CALDB/data/erosita/calvers.indx"
 +else
++    if ( ! -d "$CALDB/data/erosita" ) then
++        echo "WARNING: The directory $CALDB/data/erosita does not exist."
++        echo "Please ensure your CALDB is correctly installed and configured."
++    endif
 +    setenv CALDBCONFIG $CALDB/software/tools/caldb.config
 +    setenv CALDBALIAS $CALDB/software/tools/alias_config.fits
 +    setenv SASS_CALVERS $CALDB/data/erosita/calvers.indx
@@ -99,6 +107,10 @@
 +      echo "  export CALDBALIAS=\$CALDB/software/tools/alias_config.fits"
 +      echo "  export SASS_CALVERS=\$CALDB/data/erosita/calvers.indx"
 +  else
++      if [ ! -d "$CALDB/data/erosita" ]; then
++          echo "WARNING: The directory $CALDB/data/erosita does not exist."
++          echo "Please ensure your CALDB is correctly installed and configured."
++      fi
 +      export CALDBCONFIG=$CALDB/software/tools/caldb.config
 +      export CALDBALIAS=$CALDB/software/tools/alias_config.fits
 +      export SASS_CALVERS=$CALDB/data/erosita/calvers.indx
