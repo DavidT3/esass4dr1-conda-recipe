@@ -1,5 +1,5 @@
 --- eSASS/autoconf/setup/esass-init.sh.in
-+++ eSASS/autoconf/setup/esass-init.sh.in	(date 1783875267070)
++++ eSASS/autoconf/setup/esass-init.sh.in
 @@ -2,8 +2,9 @@
  # Setup script for eSASS environment
  # This file has been automatically generated at eSASS compile time
@@ -12,13 +12,11 @@
 
  export SASS_ROOT=$(realpath $(dirname $BASH_SOURCE)/../)
  export SASS_DIR=$SASS_ROOT
+@@ -36,4 +37,19 @@
+ #ulimit -s 32768
 
-@@ -38,3 +38,18 @@
 
-
- # CALDB
-+
-+
++# Patched in during Conda package build
 +if [ -z "$CALDB" ]; then
 +    echo "WARNING: The CALDB environment variable is not set."
 +    echo "Please set CALDB to your calibration database path. For example:"
@@ -32,11 +30,12 @@
 +    export CALDBALIAS=$CALDB/software/tools/alias_config.fits
 +    export SASS_CALVERS=$CALDB/data/erosita/calvers.indx
 +fi
-\ No newline at end of file
++
+ # CALDB
 
 
 --- eSASS/autoconf/setup/esass-init.csh.in
-+++ eSASS/autoconf/setup/esass-init.csh.in	(date 1783956980985)
++++ eSASS/autoconf/setup/esass-init.csh.in
 @@ -2,8 +2,9 @@
  # Setup script for eSASS environment
  # This file has been automatically generated at eSASS compiletime
@@ -49,13 +48,10 @@
 
  setenv SASS_ROOT @prefix@
  #setenv SASS_DIR $SASS_ROOT
+@@ -30,4 +31,19 @@
 
-@@ -32,3 +32,18 @@
  setenv PATH $SASS_ROOT/bin:$PATH
 
- # CALDB
-+
-+
 +if ( ! $?CALDB ) then
 +    echo "WARNING: The CALDB environment variable is not set."
 +    echo "Please set CALDB to your calibration database path. For example:"
@@ -69,10 +65,12 @@
 +    setenv CALDBALIAS $CALDB/software/tools/alias_config.fits
 +    setenv SASS_CALVERS $CALDB/data/erosita/calvers.indx
 +endif
++
+ # CALDB
 
 
 --- eSASS/autoconf/setup/esass-init.zsh.in
-+++ eSASS/autoconf/setup/esass-init.zsh.in	(date 1783957782537)
++++ eSASS/autoconf/setup/esass-init.zsh.in
 @@ -2,8 +2,10 @@
  # Setup script for eSASS environment
  # This file has been automatically generated at eSASS compile time
@@ -86,13 +84,10 @@
  if [[ $SHELL != *"zsh"* ]];
  then
   echo " This script is for ZSH shell, you are running ${SHELL}"
+@@ -44,6 +46,19 @@
+   export PATH=$SASS_ROOT/bin:$PATH
+   #ulimit -s 32768
 
-@@ -48,4 +48,19 @@
-
-
-   # CALDB
-+
-+
 +  if [ -z "$CALDB" ]; then
 +      echo "WARNING: The CALDB environment variable is not set."
 +      echo "Please set CALDB to your calibration database path. For example:"
@@ -106,4 +101,6 @@
 +      export CALDBALIAS=$CALDB/software/tools/alias_config.fits
 +      export SASS_CALVERS=$CALDB/data/erosita/calvers.indx
 +  fi
+
+   # CALDB
  fi
