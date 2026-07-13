@@ -185,7 +185,7 @@ export ESASS_DIR=\$CONDA_PREFIX/eSASS4DR1/eSASS
 #export SASS_ROOT=\$ESASS_DIR
 
 # Check if the user is running Zsh
-if [ -n "$ZSH_VERSION" ]; then
+if [ -n "\$ZSH_VERSION" ]; then
     source "\$ESASS_DIR/bin/esass-init.zsh"
 # Otherwise, default to the Bash script
 else
