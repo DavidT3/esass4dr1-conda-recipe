@@ -64,6 +64,8 @@ about:
   license_file:
     - COPYING
     - external/Healpix_3.50/READ_Copyrights_Licenses.txt
+    - "**/*LICENSE*"
+    - "**/*COPYING*"
   documentation: https://erosita.mpe.mpg.de/dr1/eSASS4DR1/
   summary: "eROSITA Science Analysis Software System for DR1"
   description: |
