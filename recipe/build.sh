@@ -12,7 +12,8 @@ export HEADAS=$PREFIX/heasoft/
 source $HEADAS/headas-init.sh
 
 # Set up variable to hold the path to the HEALpix source
-export HEALPIX_DIR=$SRC_DIR/external/Healpix_3.50
+export EXTERNAL_DIR=$SRC_DIR/external
+export HEALPIX_DIR=$EXTERNAL_DIR/Healpix_3.50
 
 # HEALpix wants a static cfitsio.a, but conda provides .so
 # We fulfill the requirement with a symlink within the build prefix
@@ -110,11 +111,13 @@ cd $SRC_DIR/eSASS/autoconf
 echo "Running autoreconf..."
 autoreconf -fi -v
 
-export ESASS_INSTALL_DIR=$PREFIX/esass
-
 echo "Configuring eSASS..."
+export ALL_ESASS_DIR=$PREFIX/eSASS4DR1/
+export ESASS_PREFIX=$ALL_ESASS_DIR/eSASS
+mkdir -p $ESASS_PREFIX
+
 ./configure \
-    --prefix=$ESASS_INSTALL_DIR \
+    --prefix=$ESASS_PREFIX \
     --with-healpix=$HEALPIX_DIR \
     --with-headas=$HEADAS \
     --with-gsl=system \
@@ -126,18 +129,41 @@ echo "Configuring eSASS..."
     FFLAGS="-I$PREFIX/include" \
     FCFLAGS="-I$PREFIX/include"
 
-echo "Starting eSASS build (sequential)..."
+echo "Starting eSASS build..."
 make
 
 echo "Installing eSASS..."
 make install
 
-echo "Symlinking binaries to top-level bin directory..."
-mkdir -p $PREFIX/bin
-for f in $PREFIX/esass/bin/*; do
-    # We use relative symlinks for portability within the Conda prefix
-    ln -s ../esass/bin/$(basename $f) $PREFIX/bin/$(basename $f)
-done
+#echo "Moving other eSASS components to host..."
+# ------------- Moving top level information files --------------
+cp $SRC_DIR/AUTHORS $ALL_ESASS_DIR
+cp $SRC_DIR/COPYING $ALL_ESASS_DIR
+cp $SRC_DIR/README.md $ALL_ESASS_DIR
+# ---------------------------------------------------------------
+
+# --------------- Moving eSASS information files ----==----------
+cp $SRC_DIR/eSASS/AUTHORS $ESASS_PREFIX
+cp $SRC_DIR/eSASS/COPYING $ESASS_PREFIX
+# ---------------------------------------------------------------
+
+# --------------- Moving the 'external' directory ---------------
+export EXTERNAL_INSTALL_DIR=$ALL_ESASS_DIR/external/
+mkdir -p $EXTERNAL_INSTALL_DIR
+cp -r $EXTERNAL_DIR $EXTERNAL_INSTALL_DIR
+# ---------------------------------------------------------------
+
+# --------------- Moving the 'erosita' directory ----------------
+cp -r $SRC_DIR/eSASS/erosita $ESASS_PREFIX/erosita
+# ---------------------------------------------------------------
+
+# ----------------- Moving the 'sass' directory -----------------
+cp -r $SRC_DIR/eSASS/sass $ESASS_PREFIX/sass
+# ---------------------------------------------------------------
+
+# --------------- Moving the 'scripts' directory ----------------
+cp -r $SRC_DIR/eSASS/scripts $ESASS_PREFIX/scripts
+# ---------------------------------------------------------------
 
 echo ""
 echo "================================================================"
@@ -148,18 +174,42 @@ echo ""
 mkdir -p $PREFIX/etc/conda/activate.d
 mkdir -p $PREFIX/etc/conda/deactivate.d
 
-echo "Writing activation script..."
-cat <<EOF > $PREFIX/etc/conda/activate.d/esass_activate.sh
+echo "Writing activation scripts..."
+cat <<EOF > $PREFIX/etc/conda/activate.d/post_heasoft_esass_activate.sh
 #!/bin/bash
 
-# Point to the new eSASS subdirectory
-export ESASS_DIR=\$PREFIX/esass
-if [ -f "\$ESASS_DIR/bin/esass-init.sh" ]; then
-    # Ensure SASS_ROOT points to the internal esass folder
-    export SASS_ROOT=\$ESASS_DIR
+# Point to the eSASS4DR1/eSASS subdirectory
+export ESASS_DIR=\$CONDA_PREFIX/eSASS4DR1/eSASS
+
+# Ensure SASS_ROOT points to the internal esass folder
+#export SASS_ROOT=\$ESASS_DIR
+
+# Check if the user is running Zsh
+if [ -n "\$ZSH_VERSION" ]; then
+    source "\$ESASS_DIR/bin/esass-init.zsh"
+# Otherwise, default to the Bash script
+else
     source "\$ESASS_DIR/bin/esass-init.sh"
 fi
+
+echo "Activating eSASS in \$ESASS_DIR"
 EOF
+
+cat <<EOF > $PREFIX/etc/conda/activate.d/post_heasoft_esass_activate.csh
+#!/bin/csh
+
+# Point to the eSASS4DR1/eSASS subdirectory
+setenv ESASS_DIR \$CONDA_PREFIX/eSASS4DR1/eSASS
+
+# Ensure SASS_ROOT points to the internal esass folder
+#setenv SASS_ROOT \$ESASS_DIR
+
+# Source the C shell init script
+source \$ESASS_DIR/bin/esass-init.csh
+
+echo "Activating eSASS in \$ESASS_DIR"
+EOF
+
 
 echo "Writing deactivation script..."
 cat <<EOF > $PREFIX/etc/conda/deactivate.d/esass_deactivate.sh

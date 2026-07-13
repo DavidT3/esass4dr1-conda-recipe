@@ -13,6 +13,7 @@ source:
   patches:
     - patches/0001-fix-macos-paths-and-static-linking.patch
     - patches/0002-fix-caldb-makefile-syntax.patch
+    - patches/0003-modify-esass-init-scripts.patch
 
 build:
   number: 0
@@ -57,12 +58,19 @@ requirements:
     - python >=3.8
     - astropy
 
+# The simplest test possible, just getting the version of one of the binaries.
+tests:
+  - script:
+      - srctool --version
+
 about:
   homepage: https://erosita.mpe.mpg.de/dr1/eSASS4DR1/
   license: GPL-2.0-or-later
   license_file:
     - COPYING
     - external/Healpix_3.50/READ_Copyrights_Licenses.txt
+    - "**/*LICENSE*"
+    - "**/*COPYING*"
   documentation: https://erosita.mpe.mpg.de/dr1/eSASS4DR1/
   summary: "eROSITA Science Analysis Software System for DR1"
   description: |
