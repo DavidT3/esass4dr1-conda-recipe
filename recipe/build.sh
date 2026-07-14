@@ -148,9 +148,9 @@ cp $SRC_DIR/eSASS/COPYING $ESASS_PREFIX
 # ---------------------------------------------------------------
 
 # --------------- Moving the 'external' directory ---------------
+# We copy to $ALL_ESASS_DIR so that the result is $ALL_ESASS_DIR/external
+cp -r $EXTERNAL_DIR $ALL_ESASS_DIR
 export EXTERNAL_INSTALL_DIR=$ALL_ESASS_DIR/external/
-mkdir -p $EXTERNAL_INSTALL_DIR
-cp -r $EXTERNAL_DIR $EXTERNAL_INSTALL_DIR
 # ---------------------------------------------------------------
 
 # --------------- Moving the 'erosita' directory ----------------
@@ -217,6 +217,44 @@ cat <<EOF > $PREFIX/etc/conda/deactivate.d/esass_deactivate.sh
 unset SASS_BIN_ROOT SASS_SETUP SASS_ROOT E_ROOT CALDB CALDBCONFIG
 unset SASS_TEMPLATES E_MOD E_LIB SASS_CALVERS SASS_DIR
 EOF
+
+echo ""
+echo "================================================================"
+echo "STAGE 5: Post-Build Cleanup and Optimization"
+echo "================================================================"
+echo ""
+
+echo "Removing static libraries..."
+# These were needed for linking during build but are not used at runtime
+rm -rf $ESASS_PREFIX/lib/*.a
+
+echo "Removing build artifacts from eSASS/erosita/task..."
+# This directory contains source files and object files from the compilation
+rm -rf $ESASS_PREFIX/erosita/task
+
+echo "Cleaning up the external/ directory..."
+# Remove source trees for GSL, dierckx, and slatec as they are already linked
+rm -rf $EXTERNAL_INSTALL_DIR/gsl-2.6
+rm -rf $EXTERNAL_INSTALL_DIR/dierckx
+rm -rf $EXTERNAL_INSTALL_DIR/slatec
+
+# For HEALPix, we keep the binaries and data, but remove source/build artifacts
+HEALPIX_INSTALL_DIR=$EXTERNAL_INSTALL_DIR/Healpix_3.50
+if [ -d "$HEALPIX_INSTALL_DIR" ]; then
+    echo "Trimming HEALPix installation..."
+    rm -rf $HEALPIX_INSTALL_DIR/src
+    rm -rf $HEALPIX_INSTALL_DIR/build
+    rm -rf $HEALPIX_INSTALL_DIR/lib/*.a
+    rm -rf $HEALPIX_INSTALL_DIR/test
+    # Remove build-related files in the HEALPix root but keep READMEs/Licenses
+    find $HEALPIX_INSTALL_DIR -maxdepth 1 -type f ! -name "README*" ! -name "COPYING" ! -name "Version" -delete
+fi
+
+echo "Cleaning up scripts directory..."
+# We keep only the demoscript_DR1.py for user verification
+find $ESASS_PREFIX/scripts -mindepth 1 ! -name "demoscript_DR1.py" -exec rm -rf {} +
+
+echo "Cleanup complete."
 
 echo ""
 echo "================================================================"
