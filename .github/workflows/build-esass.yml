@@ -19,35 +19,48 @@ jobs:
             target-platform: linux-64
             heasoft: "6.35.*"
             # GCC version
-            compiler-version: "14.2.0"
+            c-compiler-version: "15.0.*"
+            cxx-compiler-version: "15.0.*"
+            fortran-compiler-version: "15.0.*"
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.36.*"
             # GCC version
-            compiler-version: "15.*"
+            c-compiler-version: "15.*"
+            cxx-compiler-version: "15.*"
+            fortran-compiler-version: "15.2.*"
 
           # MacOS ARM builds (macos-latest is ARM64)
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.35.*"
-            compiler-version: "20.*"
+            # clang versions and gfortran version
+            c-compiler-version: "20.*"
+            cxx-compiler-version: "20.*"
+            fortran-compiler-version: "==14.2.0"
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.36.*"
-            # clang version
-            compiler-version: "22.*"
+            # clang versions and gfortran version
+            c-compiler-version: "22.*"
+            cxx-compiler-version: "22.*"
+            fortran-compiler-version: "15.*"
 
           # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
           - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.35.*"
-            # This is a clang version
-            compiler-version: "20.*"
+            # clang versions and gfortran version
+            c-compiler-version: "20.*"
+            cxx-compiler-version: "20.*"
+            fortran-compiler-version: "==14.2.0"
           - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.36.*"
-            # This is a clang version
-            compiler-version: "22.*"
+            # clang versions and gfortran version
+            c-compiler-version: "22.*"
+            cxx-compiler-version: "22.*"
+            fortran-compiler-version: "15.*"
 
     steps:
       - name: Checkout code
@@ -76,7 +89,9 @@ jobs:
             --channel conda-forge \
             --variant version=${{ env.ESASS_VERSION }} \
             --variant heasoft_version=${{ matrix.heasoft }} \
-            --variant compiler_version=${{ matrix.compiler-version }} \
+            --variant c-compiler-version=${{ matrix.c-compiler-version }} \
+            --variant cxx-compiler-version=${{ matrix.cxx-compiler-version }} \
+            --variant fortran-compiler-version=${{ matrix.fortran-compiler-version }} \
             --target-platform ${{ matrix.target-platform }} \
           upload-artifact: true
           artifact-name: ${{ matrix.target-platform }}_esass4dr1-${{ env.ESASS_VERSION }}-heasoft${{ steps.format_name.outputs.heasoft_name }}
