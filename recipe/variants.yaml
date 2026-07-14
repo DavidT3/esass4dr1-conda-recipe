@@ -1,7 +1,0 @@
-heasoft_ver:
-  - "6.35.*"
-  - "6.36.*"
-target_platform:
-  - linux-64
-  - osx-64
-  - osx-arm64
