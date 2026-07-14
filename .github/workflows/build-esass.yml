@@ -1,5 +1,8 @@
 name: Build and package eSASS4DR1
 
+env:
+  ESASS_VERSION: "1.0.2"
+
 on:
   workflow_dispatch:
 
@@ -53,7 +56,8 @@ jobs:
       - name: Format artifact name
         id: format_name
         run: |
-          HEASOFT_NAME=$(echo "${{ matrix.heasoft }}" | sed 's/\*/all/g')
+          # Replace * with all and . with _
+          HEASOFT_NAME=$(echo "${{ matrix.heasoft }}" | sed 's/\*/all/g; s/\./_/g')
           echo "heasoft_name=$HEASOFT_NAME"
           echo "heasoft_name=$HEASOFT_NAME" >> $GITHUB_OUTPUT
 
@@ -70,8 +74,9 @@ jobs:
           build-args: |
             --channel https://heasarc.gsfc.nasa.gov/FTP/software/conda \
             --channel conda-forge \
+            --variant version=${{ env.ESASS_VERSION }} \
             --variant heasoft_version=${{ matrix.heasoft }} \
             --variant compiler_version=${{ matrix.compiler-version }} \
             --target-platform ${{ matrix.target-platform }} \
           upload-artifact: true
-          artifact-name: eSASS4DR1-${{ matrix.target-platform }}-heasoft${{ steps.format_name.outputs.heasoft_name }}
+          artifact-name: ${{ matrix.target-platform }}_esass4dr1-${{ env.ESASS_VERSION }}-heasoft${{ steps.format_name.outputs.heasoft_name }}
