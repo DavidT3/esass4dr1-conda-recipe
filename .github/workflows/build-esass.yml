@@ -89,9 +89,9 @@ jobs:
             --channel conda-forge \
             --variant version=${{ env.ESASS_VERSION }} \
             --variant heasoft_version=${{ matrix.heasoft }} \
-            --variant c-compiler-version=${{ matrix.c-compiler-version }} \
-            --variant cxx-compiler-version=${{ matrix.cxx-compiler-version }} \
-            --variant fortran-compiler-version=${{ matrix.fortran-compiler-version }} \
+            --variant c_compiler_version=${{ matrix.c-compiler-version }} \
+            --variant cxx_compiler_version=${{ matrix.cxx-compiler-version }} \
+            --variant fortran_compiler_version=${{ matrix.fortran-compiler-version }} \
             --target-platform ${{ matrix.target-platform }} \
           upload-artifact: true
           artifact-name: ${{ matrix.target-platform }}_esass4dr1-${{ env.ESASS_VERSION }}-heasoft${{ steps.format_name.outputs.heasoft_name }}

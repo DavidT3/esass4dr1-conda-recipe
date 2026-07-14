@@ -23,9 +23,9 @@ build:
 
 requirements:
   build:
-    - ${{ compiler('c') }} ${{ c-compiler-version|default('') }}
-    - ${{ compiler('cxx') }} ${{ cxx-compiler-version|default('') }}
-    - ${{ compiler('fortran') }} ${{ fortran-compiler-version|default('') }}
+    - ${{ compiler('c') }} ${{ c_compiler_version|default('') }}
+    - ${{ compiler('cxx') }} ${{ cxx_compiler_version|default('') }}
+    - ${{ compiler('fortran') }} ${{ fortran_compiler_version|default('') }}
     - autoconf
     - automake
     - libtool
