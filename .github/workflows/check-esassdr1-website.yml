@@ -12,18 +12,21 @@ jobs:
       issues: write  # So issues can be opened
 
     steps:
-    - name: Webpage change detector
-      uses: swimmwatch/webchanges-action@v1.0.1
-      with:
-        jobs: |
-          name: eSASS4DR1 page monitor
-          url: https://erosita.mpe.mpg.de/dr1/eSASS4DR1/eSASS4DR1_installation/
-          use_browser: false
-        config: |
-          report:
-            github_issue:
-              enabled: true
-              owner: "${{ github.repository_owner }}"
-              repo: "${{ github.event.repository.name }}"
-              token: "${{ secrets.GITHUB_TOKEN }}"
-              title: "eSASS4DR1 installation page change detected: {dt}"
+      - name: Checkout main branch
+        uses: actions/checkout@v5.0.0
+
+      - name: Webpage change detector
+        uses: swimmwatch/webchanges-action@v1.0.1
+        with:
+          jobs: |
+            name: eSASS4DR1 page monitor
+            url: https://erosita.mpe.mpg.de/dr1/eSASS4DR1/eSASS4DR1_installation/
+            use_browser: false
+          config: |
+            report:
+              github_issue:
+                enabled: true
+                owner: "${{ github.repository_owner }}"
+                repo: "${{ github.event.repository.name }}"
+                token: "${{ secrets.GITHUB_TOKEN }}"
+                title: "eSASS4DR1 installation page change detected: {dt}"
