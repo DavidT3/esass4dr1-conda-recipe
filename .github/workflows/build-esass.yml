@@ -19,9 +19,10 @@ jobs:
             target-platform: linux-64
             heasoft: "6.35.*"
             # GCC version
-            c-compiler-version: "15.0.*"
-            cxx-compiler-version: "15.0.*"
-            fortran-compiler-version: "15.0.*"
+            c-compiler-version: "15.*"
+            cxx-compiler-version: "15.*"
+            fortran-compiler-version: "15.*"
+
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.36.*"
@@ -29,6 +30,7 @@ jobs:
             c-compiler-version: "15.*"
             cxx-compiler-version: "15.*"
             fortran-compiler-version: "15.2.*"
+
 
           # MacOS ARM builds (macos-latest is ARM64)
           - os: macos-latest
@@ -38,6 +40,7 @@ jobs:
             c-compiler-version: "20.*"
             cxx-compiler-version: "20.*"
             fortran-compiler-version: "==14.2.0"
+
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.36.*"
@@ -45,6 +48,7 @@ jobs:
             c-compiler-version: "22.*"
             cxx-compiler-version: "22.*"
             fortran-compiler-version: "15.*"
+
 
           # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
           - os: macos-26-intel
@@ -54,6 +58,7 @@ jobs:
             c-compiler-version: "20.*"
             cxx-compiler-version: "20.*"
             fortran-compiler-version: "==14.2.0"
+
           - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.36.*"
