@@ -23,16 +23,16 @@ build:
 
 requirements:
   build:
-    - ${{ compiler('c') }}
-    - ${{ compiler('cxx') }}
-    - ${{ compiler('fortran') }}
+    - ${{ compiler('c') }} ${{ gcc_version|default('') }}
+    - ${{ compiler('cxx') }} ${{ gcc_version|default('') }}
+    - ${{ compiler('fortran') }} ${{ gcc_version|default('') }}
     - autoconf
     - automake
     - libtool
     - make
     - pkg-config
   host:
-    - heasoft ${{ heasoft_ver }}  # From the HEASARC channel
+    - heasoft ${{ heasoft_version }}  # From the HEASARC channel
     - fftw
     - gsl
     - readline
@@ -46,7 +46,7 @@ requirements:
       then:
         - llvm-openmp
   run:
-    - heasoft ${{ heasoft_ver }}
+    - heasoft ${{ heasoft_version }}
     - fftw
     - gsl
     - if: linux

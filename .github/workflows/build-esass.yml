@@ -15,29 +15,41 @@ jobs:
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.35.*"
+            gcc-version: "14"
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.36.*"
-          
+            gcc-version: "15"
+
           # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
           - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.35.*"
+            gcc-version: "14"
           - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.36.*"
-          
+            gcc-version: "15"
+
           # MacOS ARM builds (macos-latest is ARM64)
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.35.*"
+            gcc-version: "14"
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.36.*"
+            gcc-version: "15"
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
+
+      - name: Format artifact name
+        id: format_name
+        run: |
+          HEASOFT_NAME=$(echo "${{ matrix.heasoft }}" | sed 's/\*/all/g')
+          echo "heasoft_name=$HEASOFT_NAME" >> $GITHUB_OUTPUT
 
       - name: Increase file limits (Linux/macOS)
         run: |
@@ -52,7 +64,7 @@ jobs:
           build-args: |
             --channel https://heasarc.gsfc.nasa.gov/FTP/software/conda \
             --channel conda-forge \
-            --variant heasoft_ver=${{ matrix.heasoft }} \
+            --variant "heasoft_version=${{ matrix.heasoft }},gcc_version=${{ matrix.gcc-version }}" \
             --target-platform ${{ matrix.target-platform }} \
-          upload-artifact: 'true'
-          artifact-name: eSASS4DR1-${{ matrix.target-platform }}-${{ matrix.heasoft }}
+          upload-artifact: true
+          artifact-name: eSASS4DR1-${{ matrix.target-platform }}-${{ steps.format_name.outputs.heasoft_name }}
