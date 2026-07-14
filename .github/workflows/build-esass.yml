@@ -15,25 +15,31 @@ jobs:
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.35.*"
+            gcc-version: "14"
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.36.*"
-          
+            gcc-version: ""
+
           # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
           - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.35.*"
+            gcc-version: "14"
           - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.36.*"
-          
+            gcc-version: ""
+
           # MacOS ARM builds (macos-latest is ARM64)
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.35.*"
+            gcc-version: "14"
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.36.*"
+            gcc-version: ""
 
     steps:
       - name: Checkout code
@@ -52,7 +58,7 @@ jobs:
           build-args: |
             --channel https://heasarc.gsfc.nasa.gov/FTP/software/conda \
             --channel conda-forge \
-            --variant heasoft_ver=${{ matrix.heasoft }} \
+            --variant "heasoft_version=${{ matrix.heasoft }},gcc_version=${{ matrix.gcc-version }}" \
             --target-platform ${{ matrix.target-platform }} \
-          upload-artifact: 'true'
+          upload-artifact: true
           artifact-name: eSASS4DR1-${{ matrix.target-platform }}-${{ matrix.heasoft }}
