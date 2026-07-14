@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    name: Build eSASS4DR1 (${{ matrix.os }}, HEASoft ${{ matrix.heasoft }})
+    name: Build eSASS4DR1 (${{ matrix.os }}/${{ matrix.target-platform }}, HEASoft ${{ matrix.heasoft }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
