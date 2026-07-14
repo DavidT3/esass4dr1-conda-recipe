@@ -1,3 +1,4 @@
 # Project exclude paths
 /recipe/output/
 /tests/data/em01_053141_020_EventList_c010.fits
+.claude
