@@ -32,7 +32,7 @@ requirements:
     - make
     - pkg-config
   host:
-    - heasoft  # From the HEASARC channel
+    - heasoft ${{ heasoft_ver }}  # From the HEASARC channel
     - fftw
     - gsl
     - readline
@@ -46,7 +46,7 @@ requirements:
       then:
         - llvm-openmp
   run:
-    - heasoft
+    - heasoft ${{ heasoft_ver }}
     - fftw
     - gsl
     - if: linux

@@ -1,0 +1,58 @@
+name: Build and package eSASS4DR1
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build eSASS4DR1 (${{ matrix.os }}, HEASoft ${{ matrix.heasoft }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux builds
+          - os: ubuntu-latest
+            target-platform: linux-64
+            heasoft: "6.35.*"
+          - os: ubuntu-latest
+            target-platform: linux-64
+            heasoft: "6.36.*"
+          
+          # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
+          - os: macos-26-intel
+            target-platform: osx-64
+            heasoft: "6.35.*"
+          - os: macos-26-intel
+            target-platform: osx-64
+            heasoft: "6.36.*"
+          
+          # MacOS ARM builds (macos-latest is ARM64)
+          - os: macos-latest
+            target-platform: osx-arm64
+            heasoft: "6.35.*"
+          - os: macos-latest
+            target-platform: osx-arm64
+            heasoft: "6.36.*"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Increase file limits (Linux/macOS)
+        run: |
+          ulimit -n 16000 || true
+          echo "Current file limits:"
+          ulimit -a
+
+      - name: Build package
+        uses: prefix-dev/rattler-build-action@v0.2.39
+        with:
+          recipe-path: recipe/recipe.yaml
+          build-args: |
+            --variant heasoft_ver=${{ matrix.heasoft }} 
+            --target-platform ${{ matrix.target-platform }}
+            -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/
+            -c conda-forge
+          upload-artifact: 'true'
+          artifact-name: eSASS4DR1-${{ matrix.target-platform }}-${{ matrix.heasoft }}
