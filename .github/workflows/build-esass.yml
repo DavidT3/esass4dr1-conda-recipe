@@ -15,31 +15,36 @@ jobs:
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.35.*"
-            gcc-version: "14.2.0"
+            # GCC version
+            compiler-version: "14.2.0"
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.36.*"
-            gcc-version: "15.*"
-
-          # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
-          - os: macos-26-intel
-            target-platform: osx-64
-            heasoft: "6.35.*"
-            gcc-version: "14.2.0"
-          - os: macos-26-intel
-            target-platform: osx-64
-            heasoft: "6.36.*"
-            gcc-version: "15.*"
+            # GCC version
+            compiler-version: "15.*"
 
           # MacOS ARM builds (macos-latest is ARM64)
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.35.*"
-            gcc-version: "14.2.0"
+            compiler-version: "20.*"
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.36.*"
-            gcc-version: "15.*"
+            # clang version
+            compiler-version: "22.*"
+
+          # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
+          - os: macos-26-intel
+            target-platform: osx-64
+            heasoft: "6.35.*"
+            # This is a clang version
+            compiler-version: "20.*"
+          - os: macos-26-intel
+            target-platform: osx-64
+            heasoft: "6.36.*"
+            # This is a clang version
+            compiler-version: "22.*"
 
     steps:
       - name: Checkout code
@@ -66,7 +71,7 @@ jobs:
             --channel https://heasarc.gsfc.nasa.gov/FTP/software/conda \
             --channel conda-forge \
             --variant heasoft_version=${{ matrix.heasoft }} \
-            --variant gcc_version=${{ matrix.gcc-version }} \
+            --variant compiler_version=${{ matrix.compiler-version }} \
             --target-platform ${{ matrix.target-platform }} \
           upload-artifact: true
-          artifact-name: eSASS4DR1-${{ matrix.target-platform }}-${{ steps.format_name.outputs.heasoft_name }}
+          artifact-name: eSASS4DR1-${{ matrix.target-platform }}-heasoft${{ steps.format_name.outputs.heasoft_name }}
