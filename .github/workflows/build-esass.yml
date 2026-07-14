@@ -28,9 +28,6 @@ jobs:
   build:
     name: Build eSASS4DR1 (${{ matrix.os }}/${{ matrix.target-platform }}, HEASoft ${{ matrix.heasoft }})
     runs-on: ${{ matrix.os }}
-    if: |
-      (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
-      (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform)
     strategy:
       fail-fast: false
       matrix:
@@ -90,9 +87,15 @@ jobs:
 
     steps:
       - name: Checkout code
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
         uses: actions/checkout@v7
 
       - name: Format artifact name
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
         id: format_name
         run: |
           # Replace * with all and . with _
@@ -101,12 +104,18 @@ jobs:
           echo "heasoft_name=$HEASOFT_NAME" >> $GITHUB_OUTPUT
 
       - name: Increase file limits (Linux/macOS)
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
         run: |
           ulimit -n 16000 || true
           echo "Current file limits:"
           ulimit -a
 
       - name: Build package
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
         uses: prefix-dev/rattler-build-action@v0.2.39
         with:
           recipe-path: recipe/recipe.yaml
