@@ -14,16 +14,25 @@ jobs:
 
     steps:
       - name: Checkout main branch
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v7
+
+      - name: Restore persistent state
+        uses: actions/cache@v6
+        with:
+          path: webchanges.db
+          key: webchanges-db-${{ github.run_id }}
+          restore-keys: |
+            webchanges-db-
 
       - name: Webpage change detector
         uses: swimmwatch/webchanges-action@v1.0.1
         with:
           jobs: |
-            name: eSASS4DR1 page monitor
-            url: https://erosita.mpe.mpg.de/dr1/eSASS4DR1/eSASS4DR1_installation/
-            use_browser: false
+            - name: eSASS4DR1 page monitor
+              url: https://erosita.mpe.mpg.de/dr1/eSASS4DR1/eSASS4DR1_installation/
+              use_browser: false
           config: |
+            database: webchanges.db
             report:
               github_issue:
                 enabled: true
