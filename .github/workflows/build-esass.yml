@@ -5,11 +5,32 @@ env:
 
 on:
   workflow_dispatch:
+    inputs:
+      heasoft_version:
+        description: 'Select HEASoft version to build'
+        type: choice
+        options:
+          - All
+          - "6.35.*"
+          - "6.36.*"
+        default: All
+      target_platform:
+        description: 'Select target platform to build'
+        type: choice
+        options:
+          - All
+          - linux-64
+          - osx-64
+          - osx-arm64
+        default: All
 
 jobs:
   build:
     name: Build eSASS4DR1 (${{ matrix.os }}/${{ matrix.target-platform }}, HEASoft ${{ matrix.heasoft }})
     runs-on: ${{ matrix.os }}
+    if: |
+      (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+      (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform)
     strategy:
       fail-fast: false
       matrix:
