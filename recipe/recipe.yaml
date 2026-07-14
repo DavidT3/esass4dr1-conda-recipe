@@ -55,8 +55,6 @@ requirements:
     - if: osx
       then:
         - llvm-openmp
-    - python >=3.8
-    - astropy
 
 # The simplest test possible, just getting the version of one of the binaries.
 tests:
