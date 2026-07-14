@@ -50,9 +50,9 @@ jobs:
         with:
           recipe-path: recipe/recipe.yaml
           build-args: |
-            --variant heasoft_ver=${{ matrix.heasoft }} 
-            --target-platform ${{ matrix.target-platform }}
-            -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/
-            -c conda-forge
+            --channel https://heasarc.gsfc.nasa.gov/FTP/software/conda \
+            --channel conda-forge \
+            --variant heasoft_ver=${{ matrix.heasoft }} \
+            --target-platform ${{ matrix.target-platform }} \
           upload-artifact: 'true'
           artifact-name: eSASS4DR1-${{ matrix.target-platform }}-${{ matrix.heasoft }}
