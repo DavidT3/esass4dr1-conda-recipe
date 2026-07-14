@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       heasoft_version:
-        description: 'Select HEASoft version to build'
+        description: 'HEASoft version to build eSASS against'
         type: choice
         options:
           - All
@@ -15,7 +15,7 @@ on:
           - "6.36.*"
         default: All
       target_platform:
-        description: 'Select target platform to build'
+        description: 'eSASS build target platform'
         type: choice
         options:
           - All
