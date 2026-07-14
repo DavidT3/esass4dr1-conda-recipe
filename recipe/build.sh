@@ -58,7 +58,7 @@ sed -e "s|^F90_FC.*$|F90_FC = $F90_FC|" \
     -e "s|^F90_CC.*$|F90_CC = $F90_CC|" \
     -e "s|^F90_CFLAGS.*$|F90_CFLAGS = $F90_CFLAGS|" \
     -e "s|^HEALPIX=.*$|HEALPIX = $HEALPIX_DIR|" \
-    -e "s|^FITSDIR.*$|FITSDIR = $PREFIX/lib|" \
+    -e "s|^FITSDIR.*$|FITSDIR = $PREFIX/heasoft/lib|" \
     -e "s|^LIBFITS.*$|LIBFITS = cfitsio|" \
     -e "s|^F90_BINDIR.*$|F90_BINDIR = $HEALPIX_DIR/bin|" \
     -e "s|^F90_INCDIR.*$|F90_INCDIR = $HEALPIX_DIR/include|" \
