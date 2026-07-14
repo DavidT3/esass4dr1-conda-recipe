@@ -15,31 +15,31 @@ jobs:
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.35.*"
-            gcc-version: "14"
+            gcc-version: "14.*"
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.36.*"
-            gcc-version: "15"
+            gcc-version: "15.*"
 
           # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
           - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.35.*"
-            gcc-version: "14"
+            gcc-version: "14.*"
           - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.36.*"
-            gcc-version: "15"
+            gcc-version: "15.*"
 
           # MacOS ARM builds (macos-latest is ARM64)
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.35.*"
-            gcc-version: "14"
+            gcc-version: "14.*"
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.36.*"
-            gcc-version: "15"
+            gcc-version: "15.*"
 
     steps:
       - name: Checkout code
