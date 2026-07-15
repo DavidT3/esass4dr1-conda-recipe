@@ -249,7 +249,7 @@ jobs:
         with:
           environment-name: test-env
           create-args: >-
-            python=3.11
+            python=3.12
             -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/
             -c conda-forge
 
@@ -265,7 +265,7 @@ jobs:
 
           # Install and run rattler-index for indexing
           micromamba install -n base rattler-index -c conda-forge -y
-          micromamba run -n base rattler-index local_channel/
+          micromamba run -n base rattler-index fs local_channel/
 
           echo "Local channel indexed structure:"
           ls -R local_channel
