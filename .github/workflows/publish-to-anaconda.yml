@@ -32,9 +32,6 @@ jobs:
   publish:
     name: Publish eSASS4DR1 (${{ matrix.target-platform }}, HEASoft ${{ matrix.heasoft }})
     runs-on: ubuntu-latest
-    if: |
-      (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
-      (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform)
     strategy:
       fail-fast: false
       matrix:
@@ -70,15 +67,24 @@ jobs:
 
     steps:
       - name: Checkout code
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform)
         uses: actions/checkout@v7
 
       - name: Format artifact name
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform)
         id: format_name
         run: |
           HEASOFT_NAME=$(echo "${{ matrix.heasoft }}" | sed 's/\*/all/g; s/\./_/g')
           echo "heasoft_name=$HEASOFT_NAME" >> $GITHUB_OUTPUT
 
       - name: Download package artifact
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform)
         uses: dawidd6/action-download-artifact@v9
         with:
           name: ${{ matrix.target-platform }}_esass4dr1-${{ env.ESASS_VERSION }}-heasoft${{ steps.format_name.outputs.heasoft_name }}
@@ -87,13 +93,19 @@ jobs:
           search_artifacts: true
 
       - name: Set up rattler-build
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform)
         uses: prefix-dev/rattler-build-action@v0.2.39
         with:
           setup-only: true
           upload-artifact: false
 
       - name: Dry run publish package
-        if: github.event.inputs.actually_publish == 'false'
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform) &&
+          (github.event.inputs.actually_publish == 'false')
         run: |
           ls raw_artifacts
           ls -l raw_artifacts/*
@@ -101,7 +113,10 @@ jobs:
           echo raw_artifacts/${{ matrix.target-platform }}/*.conda
 
       - name: Publish package
-        if: github.event.inputs.actually_publish == 'true'
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform) &&
+          (github.event.inputs.actually_publish == 'true')
         run: |
           rattler-build upload anaconda --owner=davidt3 --channel=rc raw_artifacts/${{ matrix.target-platform }}/*.conda
         env:
