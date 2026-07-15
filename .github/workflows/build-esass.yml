@@ -1,4 +1,4 @@
-name: Build and package eSASS4DR1
+name: Build eSASS4DR1 conda package and test
 
 env:
   ESASS_VERSION: "1.0.2"
@@ -245,27 +245,17 @@ jobs:
           (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
           (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
         run: |
-          mkdir -p local_channel/${{ matrix.target-platform }}
-          # Search recursively for .conda files in case they are nested
-          # We use nullglob to avoid errors if no files are found initially
-          shopt -s nullglob globstar
-          FOUND=false
-          for f in raw_artifacts/**/*.conda; do
-            BASENAME=$(basename "$f")
-            # Strip the 'target-platform_' prefix if it exists
-            STRIPPED_NAME=${BASENAME#${{ matrix.target-platform }}_}
-            echo "Copying $f to local_channel/${{ matrix.target-platform }}/$STRIPPED_NAME"
-            cp "$f" "local_channel/${{ matrix.target-platform }}/$STRIPPED_NAME"
-            FOUND=true
-          done
+          # Decompress artifacts and setup local channel structure
+          # The artifacts already contain the <platform>/ structure
+          mkdir -p local_channel/noarch
+          cp -rv raw_artifacts/* local_channel/
 
-          if [ "$FOUND" = false ]; then
-            echo "Error: No .conda files found in raw_artifacts/"
-            ls -R raw_artifacts
-            exit 1
-          fi
+          # We need rattler-build to index the channel
+          # Install it quickly into the base environment
+          micromamba install -n base rattler-build -c conda-forge -y
+          micromamba run -n base rattler-build index local_channel/
 
-          echo "Local channel structure:"
+          echo "Local channel indexed structure:"
           ls -R local_channel
 
       - name: Restore test data cache
