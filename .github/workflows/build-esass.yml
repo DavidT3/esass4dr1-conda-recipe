@@ -1,7 +1,28 @@
 name: Build and package eSASS4DR1
 
+env:
+  ESASS_VERSION: "1.0.2"
+
 on:
   workflow_dispatch:
+    inputs:
+      heasoft_version:
+        description: 'HEASoft version to build eSASS against'
+        type: choice
+        options:
+          - All
+          - "6.35.*"
+          - "6.36.*"
+        default: All
+      target_platform:
+        description: 'eSASS build target platform'
+        type: choice
+        options:
+          - All
+          - linux-64
+          - osx-64
+          - osx-arm64
+        default: All
 
 jobs:
   build:
@@ -15,56 +36,97 @@ jobs:
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.35.*"
-            gcc-version: "14"
+            # GCC version
+            c-compiler-version: "15.*"
+            cxx-compiler-version: "15.*"
+            fortran-compiler-version: "15.*"
+
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.36.*"
-            gcc-version: "15"
+            # GCC version
+            c-compiler-version: "15.*"
+            cxx-compiler-version: "15.*"
+            fortran-compiler-version: "15.2.*"
 
-          # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
-          - os: macos-26-intel
-            target-platform: osx-64
-            heasoft: "6.35.*"
-            gcc-version: "14"
-          - os: macos-26-intel
-            target-platform: osx-64
-            heasoft: "6.36.*"
-            gcc-version: "15"
 
           # MacOS ARM builds (macos-latest is ARM64)
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.35.*"
-            gcc-version: "14"
+            # clang versions and gfortran version
+            c-compiler-version: "20.*"
+            cxx-compiler-version: "20.*"
+            fortran-compiler-version: "==14.2.0"
+
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.36.*"
-            gcc-version: "15"
+            # clang versions and gfortran version
+            c-compiler-version: "22.*"
+            cxx-compiler-version: "22.*"
+            fortran-compiler-version: "15.*"
+
+
+          # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
+          - os: macos-26-intel
+            target-platform: osx-64
+            heasoft: "6.35.*"
+            # clang versions and gfortran version
+            c-compiler-version: "20.*"
+            cxx-compiler-version: "20.*"
+            fortran-compiler-version: "==14.2.0"
+
+          - os: macos-26-intel
+            target-platform: osx-64
+            heasoft: "6.36.*"
+            # clang versions and gfortran version
+            c-compiler-version: "22.*"
+            cxx-compiler-version: "22.*"
+            fortran-compiler-version: "15.*"
 
     steps:
       - name: Checkout code
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
         uses: actions/checkout@v7
 
       - name: Format artifact name
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
         id: format_name
         run: |
-          HEASOFT_NAME=$(echo "${{ matrix.heasoft }}" | sed 's/\*/all/g')
+          # Replace * with all and . with _
+          HEASOFT_NAME=$(echo "${{ matrix.heasoft }}" | sed 's/\*/all/g; s/\./_/g')
+          echo "heasoft_name=$HEASOFT_NAME"
           echo "heasoft_name=$HEASOFT_NAME" >> $GITHUB_OUTPUT
 
       - name: Increase file limits (Linux/macOS)
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
         run: |
           ulimit -n 16000 || true
           echo "Current file limits:"
           ulimit -a
 
       - name: Build package
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
         uses: prefix-dev/rattler-build-action@v0.2.39
         with:
           recipe-path: recipe/recipe.yaml
           build-args: |
             --channel https://heasarc.gsfc.nasa.gov/FTP/software/conda \
             --channel conda-forge \
-            --variant "heasoft_version=${{ matrix.heasoft }},gcc_version=${{ matrix.gcc-version }}" \
+            --variant version=${{ env.ESASS_VERSION }} \
+            --variant heasoft_version=${{ matrix.heasoft }} \
+            --variant c_compiler_version=${{ matrix.c-compiler-version }} \
+            --variant cxx_compiler_version=${{ matrix.cxx-compiler-version }} \
+            --variant fortran_compiler_version=${{ matrix.fortran-compiler-version }} \
             --target-platform ${{ matrix.target-platform }} \
           upload-artifact: true
-          artifact-name: eSASS4DR1-${{ matrix.target-platform }}-${{ steps.format_name.outputs.heasoft_name }}
+          artifact-name: ${{ matrix.target-platform }}_esass4dr1-${{ env.ESASS_VERSION }}-heasoft${{ steps.format_name.outputs.heasoft_name }}

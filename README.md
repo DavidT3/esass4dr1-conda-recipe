@@ -31,5 +31,21 @@ rattler-build build \
   --recipe recipe.yaml \
   -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ \
   -c conda-forge \
+  --variant heasoft_version="6.35.*" \
+  --variant c_compiler_version="20.*" \
+  --variant cxx_compiler_version="20.*" \
+  --variant fortran_compiler_version="==14.2.0" \
+  --keep-build
+```
+
+
+```bash
+cd recipe
+
+rattler-build build \
+  --recipe recipe.yaml \
+  -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ \
+  -c conda-forge \
+  --variant heasoft_version="6.36.*" \
   --keep-build
 ```

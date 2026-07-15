@@ -1,7 +1,7 @@
 # Recipe for eROSITA's eSASSDR1 software
 context:
   name: eSASS4DR1
-  version: 1.0.2
+  version: ${{ version|default("1.0.2") }}
 
 package:
   name: ${{ name|lower }}
@@ -21,11 +21,14 @@ build:
   skip:
     - win
 
+# The compiler versions are specified by command line arguments setting
+#  'c_compiler_version', 'cxx_compiler_version', and 'fortran_compiler_version',
+#  which are then automatically picked up below.
 requirements:
   build:
-    - ${{ compiler('c') }} ${{ gcc_version|default('') }}
-    - ${{ compiler('cxx') }} ${{ gcc_version|default('') }}
-    - ${{ compiler('fortran') }} ${{ gcc_version|default('') }}
+    - ${{ compiler('c') }}
+    - ${{ compiler('cxx') }}
+    - ${{ compiler('fortran') }}
     - autoconf
     - automake
     - libtool
