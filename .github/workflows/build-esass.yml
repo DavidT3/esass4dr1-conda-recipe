@@ -241,40 +241,6 @@ jobs:
           workflow: build-esass.yml
           search_artifacts: true
 
-      - name: Install rattler-build
-        if: |
-          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
-          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
-        uses: prefix-dev/rattler-build-action@v0.2.39
-        with:
-          setup-only: true
-          upload-artifact: false
-
-      - name: Create local conda channel
-        if: |
-          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
-          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
-        run: |
-          # Decompress artifacts and setup local channel structure
-          # The artifacts already contain the <platform>/ structure
-          mkdir -p local_channel/noarch
-          cp -rv raw_artifacts/* local_channel/
-
-          # We run rattler-build to index the channel (the 
-          rattler-build index local_channel/
-
-          echo "Local channel indexed structure:"
-          ls -R local_channel
-
-      - name: Restore test data cache
-        if: |
-          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
-          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
-        uses: actions/cache@v6
-        with:
-          path: test_data
-          key: esass-test-data-v1
-
       - name: Setup Micromamba
         if: |
           (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
@@ -286,6 +252,25 @@ jobs:
             python=3.11
             -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/
             -c conda-forge
+
+      - name: Create local conda channel
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        shell: bash -l {0}
+        run: |
+          # Setup local channel structure
+          mkdir -p local_channel/noarch
+          cp -rv raw_artifacts/* local_channel/
+
+          # Install and run rattler-index for indexing
+          micromamba install -n base rattler-index -c conda-forge -y
+          micromamba run -n base rattler-index local_channel/
+
+          echo "Local channel indexed structure:"
+          ls -R local_channel
+
+      - name: Restore test data cache
 
       - name: Install local package and dependencies
         if: |
