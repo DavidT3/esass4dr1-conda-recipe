@@ -15,7 +15,7 @@ on:
         type: boolean
         default: true
       heasoft_version:
-        description: 'HEASoft version to build eSASS against'
+        description: 'HEASoft version to build/test eSASS against'
         type: choice
         options:
           - All
@@ -23,7 +23,7 @@ on:
           - "6.36.*"
         default: All
       target_platform:
-        description: 'eSASS build target platform'
+        description: 'eSASS build/test target platform'
         type: choice
         options:
           - All
@@ -199,6 +199,7 @@ jobs:
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.35.*"
+
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.36.*"
@@ -240,6 +241,15 @@ jobs:
           workflow: build-esass.yml
           search_artifacts: true
 
+      - name: Install rattler-build
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        uses: prefix-dev/rattler-build-action@v0.2.39
+        with:
+          setup-only: true
+          upload-artifact: false
+
       - name: Create local conda channel
         if: |
           (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
@@ -250,10 +260,8 @@ jobs:
           mkdir -p local_channel/noarch
           cp -rv raw_artifacts/* local_channel/
 
-          # We need rattler-build to index the channel
-          # Install it quickly into the base environment
-          micromamba install -n base rattler-build -c conda-forge -y
-          micromamba run -n base rattler-build index local_channel/
+          # We run rattler-build to index the channel (the 
+          rattler-build index local_channel/
 
           echo "Local channel indexed structure:"
           ls -R local_channel
