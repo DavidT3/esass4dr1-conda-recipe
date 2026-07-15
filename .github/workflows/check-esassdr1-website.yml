@@ -14,7 +14,15 @@ jobs:
 
     steps:
       - name: Checkout main branch
-        uses: actions/checkout@v5.0.0
+        uses: actions/checkout@v7
+
+      - name: Restore snapshots database
+        uses: actions/cache@v6
+        with:
+          path: snapshots.db
+          key: snapshots-db-${{ github.run_id }}
+          restore-keys: |
+            snapshots-db-
 
       - name: Webpage change detector
         uses: swimmwatch/webchanges-action@v1.0.1
