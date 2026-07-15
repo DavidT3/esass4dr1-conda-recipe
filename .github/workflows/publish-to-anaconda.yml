@@ -27,6 +27,13 @@ on:
           - osx-64
           - osx-arm64
         default: All
+      conda_channel_label:
+        description: 'Published package channel label'
+        type: choice
+        options:
+          - main
+          - rc
+        default: rc
 
 jobs:
   publish:
@@ -118,7 +125,7 @@ jobs:
           (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform) &&
           (github.event.inputs.actually_publish == 'true')
         run: |
-          rattler-build upload anaconda --owner=davidt3 --channel=rc raw_artifacts/${{ matrix.target-platform }}/*.conda
+          rattler-build upload anaconda --owner=davidt3 --channel=${{ github.event.inputs.conda_channel_label }} raw_artifacts/${{ matrix.target-platform }}/*.conda
         env:
           ANACONDA_API_KEY: ${{ secrets.ANACONDA_API_KEY }}
           
