@@ -31,9 +31,7 @@ on:
 jobs:
   publish:
     name: Test eSASS4DR1 (${{ matrix.os }}/${{ matrix.target-platform }}, HEASoft ${{ matrix.heasoft }})
-    runs-on: ${{ matrix.os }}
-    if: |
-      always() && github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -51,21 +49,21 @@ jobs:
 
 
           # For the packages built for MacOS ARM
-          - os: ubuntu-latest
+          - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.35.*"
 
-          - os: ubuntu-latest
+          - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.36.*"
 
 
           # For the packages built for MacOS Intel
-          - os: ubuntu-latest
+          - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.35.*"
 
-          - os: ubuntu-latest
+          - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.36.*"
 
