@@ -296,11 +296,11 @@ jobs:
         shell: bash -l {0}
         run: |
           echo "Installing esass4dr1 and resolving dependencies from local channel..."
-          micromamba \
+          micromamba install \
             -c "file://$GITHUB_WORKSPACE/local_channel" \
             -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ \
             -c conda-forge \
-            install esass4dr1 
+            esass4dr1 
 
       - name: Run eSASS Test Script
         if: |
