@@ -161,9 +161,9 @@ jobs:
         run: |
           mkdir -p test_data
           cd test_data
-          curl -L https://erosita.mpe.mpg.de/dr1/eSASS4DR1/eSASS4DR1_installation/caldb4DR1.tgz -o caldb.tgz
-          tar -xzf caldb.tgz
-          rm caldb.tgz
+          curl -L https://erosita.mpe.mpg.de/dr1/eSASS4DR1/eSASS4DR1_installation/caldb4DR1.tgz -o caldb4DR1.tgz
+          tar -xzf caldb4DR1.tgz
+          rm caldb4DR1.tgz
 
       - name: Download Event List
         if: steps.cache-data.outputs.cache-hit != 'true'
@@ -277,7 +277,7 @@ jobs:
         shell: bash -l {0}
         run: |
           echo "Installing esass4dr1 and resolving dependencies from local channel..."
-          micromamba install \
+          micromamba install -y \
             -c "file://$GITHUB_WORKSPACE/local_channel" \
             -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ \
             -c conda-forge \
@@ -298,7 +298,7 @@ jobs:
           (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
         shell: bash -l {0}
         run: |
-          export CALDB=$GITHUB_WORKSPACE/test_data/caldb
+          export CALDB=$GITHUB_WORKSPACE/test_data/caldb4DR1
           export CALDBCONFIG=$CALDB/software/tools/caldb.config
           export CALDBALIAS=$CALDB/software/tools/alias_config.fits
           export SASS_CALVERS=$CALDB/data/erosita/calvers.indx
