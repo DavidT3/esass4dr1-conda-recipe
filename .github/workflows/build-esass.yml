@@ -270,8 +270,6 @@ jobs:
           echo "Local channel indexed structure:"
           ls -R local_channel
 
-      - name: Restore test data cache
-
       - name: Install local package and dependencies
         if: |
           (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
@@ -284,6 +282,15 @@ jobs:
             -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ \
             -c conda-forge \
             esass4dr1 
+
+      - name: Restore test data cache
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        uses: actions/cache@v6
+        with:
+          path: test_data
+          key: esass-test-data-v1
 
       - name: Run eSASS Test Script
         if: |
