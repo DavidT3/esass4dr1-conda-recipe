@@ -17,9 +17,36 @@ export HEALPIX_DIR=$EXTERNAL_DIR/Healpix_3.50
 
 # HEALpix wants a static cfitsio.a, but conda provides .so
 # We fulfill the requirement with a symlink within the build prefix
-if [ ! -f "$PREFIX/lib/libcfitsio.a" ]; then
-    echo "Creating libcfitsio.a symlink for HEALPix..."
-    ln -s "$PREFIX/lib/libcfitsio.so" "$PREFIX/lib/libcfitsio.a"
+# Search for cfitsio in prefix lib and heasoft lib
+if [[ "$target_platform" == osx-* ]]; then
+    DYLIB_EXT="dylib"
+else
+    DYLIB_EXT="so"
+fi
+
+FOUND_CFITSIO_DIR=""
+FOUND_CFITSIO_PATH=""
+for dir in "$PREFIX/lib" "$PREFIX/heasoft/lib"; do
+    if [ -f "$dir/libcfitsio.a" ]; then
+        FOUND_CFITSIO_DIR="$dir"
+        FOUND_CFITSIO_PATH="$dir/libcfitsio.a"
+        break
+    elif [ -f "$dir/libcfitsio.$DYLIB_EXT" ]; then
+        FOUND_CFITSIO_DIR="$dir"
+        FOUND_CFITSIO_PATH="$dir/libcfitsio.$DYLIB_EXT"
+        break
+    fi
+done
+
+if [ -z "$FOUND_CFITSIO_DIR" ]; then
+    echo "Error: libcfitsio (static or dynamic) not found in $PREFIX/lib or $PREFIX/heasoft/lib"
+    exit 1
+fi
+
+echo "Found cfitsio in $FOUND_CFITSIO_DIR"
+if [[ "$FOUND_CFITSIO_PATH" == *."$DYLIB_EXT" ]]; then
+    echo "Creating libcfitsio.a symlink for HEALPix in $FOUND_CFITSIO_DIR..."
+    ln -sf "$FOUND_CFITSIO_PATH" "$FOUND_CFITSIO_DIR/libcfitsio.a"
 fi
 
 echo ""
@@ -54,11 +81,11 @@ F90_MODDIR="-J"
 # Replicate the 'editF90Makefile' function from hpxconfig_functions.sh
 sed -e "s|^F90_FC.*$|F90_FC = $F90_FC|" \
     -e "s|^F90_FFLAGS.*$|F90_FFLAGS = $F90_FFLAGS|" \
-    -e "s|^F90_LDFLAGS.*$|F90_LDFLAGS = -L$HEALPIX_DIR/lib -L$PREFIX/lib -lhealpix -lhpxgif -lcfitsio -lcurl $WLRPATH$PREFIX/lib|" \
+    -e "s|^F90_LDFLAGS.*$|F90_LDFLAGS = -L$HEALPIX_DIR/lib -L$PREFIX/lib -L$FOUND_CFITSIO_DIR -lhealpix -lhpxgif -lcfitsio -lcurl $WLRPATH$PREFIX/lib $WLRPATH$FOUND_CFITSIO_DIR|" \
     -e "s|^F90_CC.*$|F90_CC = $F90_CC|" \
     -e "s|^F90_CFLAGS.*$|F90_CFLAGS = $F90_CFLAGS|" \
     -e "s|^HEALPIX=.*$|HEALPIX = $HEALPIX_DIR|" \
-    -e "s|^FITSDIR.*$|FITSDIR = $PREFIX/heasoft/lib|" \
+    -e "s|^FITSDIR.*$|FITSDIR = $FOUND_CFITSIO_DIR|" \
     -e "s|^LIBFITS.*$|LIBFITS = cfitsio|" \
     -e "s|^F90_BINDIR.*$|F90_BINDIR = $HEALPIX_DIR/bin|" \
     -e "s|^F90_INCDIR.*$|F90_INCDIR = $HEALPIX_DIR/include|" \
