@@ -189,9 +189,11 @@ jobs:
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.35.*"
+
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.36.*"
+
 
           # MacOS ARM builds (macos-latest is ARM64)
           - os: macos-latest
@@ -201,10 +203,12 @@ jobs:
             target-platform: osx-arm64
             heasoft: "6.36.*"
 
+
           # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
           - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.35.*"
+
           - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.36.*"
@@ -253,14 +257,10 @@ jobs:
         with:
           environment-name: test-env
           create-args: >-
-            python=3.11
-            heasoft=${{ matrix.heasoft }}
-            fftw
-            gsl
             -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/
             -c conda-forge
 
-      - name: Install local package
+      - name: Install local package and dependencies
         if: |
           (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
           (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
@@ -268,8 +268,8 @@ jobs:
         run: |
           # Find the .conda file in the downloaded artifacts
           PACKAGE_FILE=$(find artifacts -name "*.conda" | head -n 1)
-          echo "Installing $PACKAGE_FILE"
-          micromamba install "$PACKAGE_FILE"
+          echo "Installing $PACKAGE_FILE and resolving dependencies..."
+          micromamba install "$PACKAGE_FILE" -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ -c conda-forge
 
       - name: Run eSASS Test Script
         if: |
@@ -278,5 +278,8 @@ jobs:
         shell: bash -l {0}
         run: |
           export CALDB=$GITHUB_WORKSPACE/test_data/caldb
+          export CALDBCONFIG=$CALDB/software/tools/caldb.config
+          export CALDBALIAS=$CALDB/software/tools/alias_config.fits
+          export SASS_CALVERS=$CALDB/data/erosita/calvers.indx
           mkdir -p outputs
           python $CONDA_PREFIX/eSASS4DR1/eSASS/scripts/demoscript_DR1.py test_data/events/em01_053141_020_EventList_c010.fits outputs/
