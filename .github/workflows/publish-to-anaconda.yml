@@ -1,0 +1,131 @@
+name: Publish the eSASS4DR1 package to an Anaconda channel
+
+env:
+  ESASS_VERSION: "1.0.2"
+
+on:
+  workflow_dispatch:
+    inputs:
+      actually_publish:
+        description: 'Publish [not ticked means dry run]'
+        type: boolean
+        default: false
+      heasoft_version:
+        description: 'HEASoft version to build/test eSASS against'
+        type: choice
+        options:
+          - All
+          - "6.35.*"
+          - "6.36.*"
+        default: All
+      target_platform:
+        description: 'eSASS build/test target platform'
+        type: choice
+        options:
+          - All
+          - linux-64
+          - osx-64
+          - osx-arm64
+        default: All
+      conda_channel_label:
+        description: 'Published package channel label'
+        type: choice
+        options:
+          - main
+          - rc
+        default: rc
+
+jobs:
+  publish:
+    name: Publish eSASS4DR1 (${{ matrix.target-platform }}, HEASoft ${{ matrix.heasoft }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # For the packages built for linux-64
+          - os: ubuntu-latest
+            target-platform: linux-64
+            heasoft: "6.35.*"
+
+          - os: ubuntu-latest
+            target-platform: linux-64
+            heasoft: "6.36.*"
+
+
+          # For the packages built for MacOS ARM
+          - os: macos-latest
+            target-platform: osx-arm64
+            heasoft: "6.35.*"
+
+          - os: macos-latest
+            target-platform: osx-arm64
+            heasoft: "6.36.*"
+
+
+          # For the packages built for MacOS Intel
+          - os: macos-26-intel
+            target-platform: osx-64
+            heasoft: "6.35.*"
+
+          - os: macos-26-intel
+            target-platform: osx-64
+            heasoft: "6.36.*"
+
+    steps:
+      - name: Checkout code
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform)
+        uses: actions/checkout@v7
+
+      - name: Format artifact name
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform)
+        id: format_name
+        run: |
+          HEASOFT_NAME=$(echo "${{ matrix.heasoft }}" | sed 's/\*/all/g; s/\./_/g')
+          echo "heasoft_name=$HEASOFT_NAME" >> $GITHUB_OUTPUT
+
+      - name: Download package artifact
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform)
+        uses: dawidd6/action-download-artifact@v9
+        with:
+          name: ${{ matrix.target-platform }}_esass4dr1-${{ env.ESASS_VERSION }}-heasoft${{ steps.format_name.outputs.heasoft_name }}
+          path: raw_artifacts
+          workflow: build-esass.yml
+          search_artifacts: true
+
+      - name: Set up rattler-build
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform)
+        uses: prefix-dev/rattler-build-action@v0.2.39
+        with:
+          setup-only: true
+          upload-artifact: false
+
+      - name: Dry run publish package
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform) &&
+          (github.event.inputs.actually_publish == 'false')
+        run: |
+          ls raw_artifacts
+          ls -l raw_artifacts/*
+
+          echo raw_artifacts/${{ matrix.target-platform }}/*.conda
+
+      - name: Publish package
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix.target-platform == github.event.inputs.target_platform) &&
+          (github.event.inputs.actually_publish == 'true')
+        run: |
+          rattler-build upload anaconda --owner=davidt3 --channel=${{ github.event.inputs.conda_channel_label }} raw_artifacts/${{ matrix.target-platform }}/*.conda
+        env:
+          ANACONDA_API_KEY: ${{ secrets.ANACONDA_API_KEY }}
+          
