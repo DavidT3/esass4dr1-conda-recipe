@@ -145,7 +145,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     if: |
-      always() &&
+      !cancelled() &&
       (github.event.inputs.run_test == 'true' || github.event_name != 'workflow_dispatch') &&
       (needs.build.result == 'success' || needs.build.result == 'skipped')
     steps:
@@ -178,7 +178,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs: [setup-test-data]
     if: |
-      always() &&
+      !cancelled() &&
       (github.event.inputs.run_test == 'true' || github.event_name != 'workflow_dispatch') &&
       (needs.setup-test-data.result == 'success')
     strategy:
