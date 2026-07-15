@@ -236,9 +236,26 @@ jobs:
         uses: dawidd6/action-download-artifact@v9
         with:
           name: ${{ matrix.target-platform }}_esass4dr1-${{ env.ESASS_VERSION }}-heasoft${{ steps.format_name.outputs.heasoft_name }}
-          path: artifacts
+          path: raw_artifacts
           workflow: build-esass.yml
           search_artifacts: true
+
+      - name: Create local conda channel
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        run: |
+          mkdir -p local_channel/${{ matrix.target-platform }}
+          # Find the package for the current platform and move it to the subfolder
+          # We also strip the platform prefix from the filename so it's a standard conda filename
+          for f in raw_artifacts/*.conda; do
+            BASENAME=$(basename "$f")
+            # Strip the 'target-platform_' prefix
+            STRIPPED_NAME=${BASENAME#${{ matrix.target-platform }}_}
+            cp "$f" "local_channel/${{ matrix.target-platform }}/$STRIPPED_NAME"
+          done
+          echo "Local channel structure:"
+          ls -R local_channel
 
       - name: Restore test data cache
         if: |
@@ -257,6 +274,7 @@ jobs:
         with:
           environment-name: test-env
           create-args: >-
+            python=3.11
             -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/
             -c conda-forge
 
@@ -266,10 +284,12 @@ jobs:
           (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
         shell: bash -l {0}
         run: |
-          # Find the .conda file in the downloaded artifacts
-          PACKAGE_FILE=$(find artifacts -name "*.conda" | head -n 1)
-          echo "Installing $PACKAGE_FILE and resolving dependencies..."
-          micromamba install "$PACKAGE_FILE" -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ -c conda-forge
+          echo "Installing esass4dr1 and resolving dependencies from local channel..."
+          micromamba \
+            -c "file://$GITHUB_WORKSPACE/local_channel" \
+            -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ \
+            -c conda-forge \
+            install esass4dr1 
 
       - name: Run eSASS Test Script
         if: |
