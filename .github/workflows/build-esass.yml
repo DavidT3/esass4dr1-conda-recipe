@@ -292,15 +292,22 @@ jobs:
           path: test_data
           key: esass-test-data-v1
 
+      - name: Move test data to short path
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        run: |
+          sudo mv test_data /tmp/d
+
       - name: Run eSASS Test Script
         if: |
           (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
           (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
         shell: bash -l {0}
         run: |
-          export CALDB=$GITHUB_WORKSPACE/test_data/caldb4DR1
+          export CALDB=/tmp/d/caldb4DR1
           export CALDBCONFIG=$CALDB/software/tools/caldb.config
           export CALDBALIAS=$CALDB/software/tools/alias_config.fits
           export SASS_CALVERS=$CALDB/data/erosita/calvers.indx
           mkdir -p outputs
-          python $CONDA_PREFIX/eSASS4DR1/eSASS/scripts/demoscript_DR1.py test_data/events/em01_053141_020_EventList_c010.fits outputs/
+          python $CONDA_PREFIX/eSASS4DR1/eSASS/scripts/demoscript_DR1.py /tmp/d/events/em01_053141_020_EventList_c010.fits outputs/
