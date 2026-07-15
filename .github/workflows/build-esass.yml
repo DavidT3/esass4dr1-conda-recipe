@@ -1,4 +1,4 @@
-name: Build and package eSASS4DR1
+name: Build eSASS4DR1 conda package and test
 
 env:
   ESASS_VERSION: "1.0.2"
@@ -6,8 +6,16 @@ env:
 on:
   workflow_dispatch:
     inputs:
+      run_build:
+        description: 'Run build stage'
+        type: boolean
+        default: true
+      run_test:
+        description: 'Run test stage'
+        type: boolean
+        default: true
       heasoft_version:
-        description: 'HEASoft version to build eSASS against'
+        description: 'HEASoft version to build/test eSASS against'
         type: choice
         options:
           - All
@@ -15,7 +23,7 @@ on:
           - "6.36.*"
         default: All
       target_platform:
-        description: 'eSASS build target platform'
+        description: 'eSASS build/test target platform'
         type: choice
         options:
           - All
@@ -28,6 +36,7 @@ jobs:
   build:
     name: Build eSASS4DR1 (${{ matrix.os }}/${{ matrix.target-platform }}, HEASoft ${{ matrix.heasoft }})
     runs-on: ${{ matrix.os }}
+    if: github.event.inputs.run_build == 'true' || github.event_name != 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
@@ -130,3 +139,168 @@ jobs:
             --target-platform ${{ matrix.target-platform }} \
           upload-artifact: true
           artifact-name: ${{ matrix.target-platform }}_esass4dr1-${{ env.ESASS_VERSION }}-heasoft${{ steps.format_name.outputs.heasoft_name }}
+
+  setup-test-data:
+    name: Setup Test Data (CalDB & Events)
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: |
+      always() &&
+      (github.event.inputs.run_test == 'true' || github.event_name != 'workflow_dispatch') &&
+      (needs.build.result == 'success' || needs.build.result == 'skipped')
+    steps:
+      - name: Restore test data cache
+        id: cache-data
+        uses: actions/cache@v6
+        with:
+          path: test_data
+          key: esass-test-data-v1
+
+      - name: Download and Unpack CalDB
+        if: steps.cache-data.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p test_data
+          cd test_data
+          curl -L https://erosita.mpe.mpg.de/dr1/eSASS4DR1/eSASS4DR1_installation/caldb4DR1.tgz -o caldb4DR1.tgz
+          tar -xzf caldb4DR1.tgz
+          rm caldb4DR1.tgz
+
+      - name: Download Event List
+        if: steps.cache-data.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p test_data/events
+          # Download from the HEASARC FTP server
+          curl -L https://heasarc.gsfc.nasa.gov/FTP/srg/data/erosita/erass1/obs/141/053/EXP_010/em01_053141_020_EventList_c010.fits.gz -o test_data/events/em01_053141_020_EventList_c010.fits.gz
+          gunzip test_data/events/em01_053141_020_EventList_c010.fits.gz
+
+  test:
+    name: Test eSASS4DR1 (${{ matrix.os }}/${{ matrix.target-platform }}, HEASoft ${{ matrix.heasoft }})
+    runs-on: ${{ matrix.os }}
+    needs: [setup-test-data]
+    if: |
+      always() &&
+      (github.event.inputs.run_test == 'true' || github.event_name != 'workflow_dispatch') &&
+      (needs.setup-test-data.result == 'success')
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux builds
+          - os: ubuntu-latest
+            target-platform: linux-64
+            heasoft: "6.35.*"
+
+          - os: ubuntu-latest
+            target-platform: linux-64
+            heasoft: "6.36.*"
+
+
+          # MacOS ARM builds (macos-latest is ARM64)
+          - os: macos-latest
+            target-platform: osx-arm64
+            heasoft: "6.35.*"
+
+          - os: macos-latest
+            target-platform: osx-arm64
+            heasoft: "6.36.*"
+
+
+          # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
+          - os: macos-26-intel
+            target-platform: osx-64
+            heasoft: "6.35.*"
+
+          - os: macos-26-intel
+            target-platform: osx-64
+            heasoft: "6.36.*"
+
+    steps:
+      - name: Checkout code
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        uses: actions/checkout@v7
+
+      - name: Format artifact name
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        id: format_name
+        run: |
+          HEASOFT_NAME=$(echo "${{ matrix.heasoft }}" | sed 's/\*/all/g; s/\./_/g')
+          echo "heasoft_name=$HEASOFT_NAME" >> $GITHUB_OUTPUT
+
+      - name: Download package artifact
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        uses: dawidd6/action-download-artifact@v9
+        with:
+          name: ${{ matrix.target-platform }}_esass4dr1-${{ env.ESASS_VERSION }}-heasoft${{ steps.format_name.outputs.heasoft_name }}
+          path: raw_artifacts
+          workflow: build-esass.yml
+          search_artifacts: true
+
+      - name: Setup Micromamba
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-name: test-env
+          create-args: >-
+            python=3.12
+            -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/
+            -c conda-forge
+
+      - name: Create local conda channel
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        shell: bash -l {0}
+        run: |
+          # Setup local channel structure
+          mkdir -p local_channel/noarch
+          cp -rv raw_artifacts/* local_channel/
+
+          # Install and run rattler-index for indexing
+          micromamba install -n base rattler-index -c conda-forge -y
+          micromamba run -n base rattler-index fs local_channel/
+
+          echo "Local channel indexed structure:"
+          ls -R local_channel
+
+      - name: Install local package and dependencies
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        shell: bash -l {0}
+        run: |
+          echo "Installing esass4dr1 and resolving dependencies from local channel..."
+          micromamba install -y \
+            -c "file://$GITHUB_WORKSPACE/local_channel" \
+            -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ \
+            -c conda-forge \
+            esass4dr1 
+
+      - name: Restore test data cache
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        uses: actions/cache@v6
+        with:
+          path: test_data
+          key: esass-test-data-v1
+
+      - name: Run eSASS Test Script
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        shell: bash -l {0}
+        run: |
+          export CALDB=$GITHUB_WORKSPACE/test_data/caldb4DR1
+          export CALDBCONFIG=$CALDB/software/tools/caldb.config
+          export CALDBALIAS=$CALDB/software/tools/alias_config.fits
+          export SASS_CALVERS=$CALDB/data/erosita/calvers.indx
+          mkdir -p outputs
+          python $CONDA_PREFIX/eSASS4DR1/eSASS/scripts/demoscript_DR1.py test_data/events/em01_053141_020_EventList_c010.fits outputs/
