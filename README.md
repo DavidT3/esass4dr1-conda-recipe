@@ -2,6 +2,24 @@
 
 This repository contains a Conda recipe for eROSITA's eSASSDR1 software. It supports multiple HEASoft versions (6.35.* and 6.36.*) and architectures (Linux-64, macOS-ARM64, macOS-64).
 
+## How to install eSASS4DR1 through Conda
+
+The Conda-packaged version of eSASS4DR1 is hosted on a Conda community channel (https://anaconda.org/channels/davidt3), as it is not possible to release a package on conda-forge when it has external dependencies (HEASoft being on the HEASARC Conda channel in this instance).
+
+To create a minimal new Conda environment (`esass4dr1-env`) with eSASS4DR1 installed, you could use the following command:
+
+```bash
+conda create -c https://heasarc.gsfc.nasa.gov/FTP/software/conda -c conda-forge -n esass4dr1-env davidt3::esass4dr1
+```
+
+We have to specify the HEASARC channel as an allowed source of packages (`-c https://heasarc.gsfc.nasa.gov/FTP/software/conda`) because the eSASS4DR1 package will install HEASoft as a dependency (there is also a Conda-packaged version of HEASoft released through the bio-conda channel, but we do not recommend using it with this version of eSASS4DR1, as it we did not build against it, and we actively maintain the HEASARC-published Conda package, so can better guarantee long-term support. 
+
+The HEASARC package install will also install Python, so if you wish to specify a Python version for this environment you should do it at creation time, e.g.:
+
+```bash
+conda create -c https://heasarc.gsfc.nasa.gov/FTP/software/conda -c conda-forge -n esass4dr1-env davidt3::esass4dr1 python=3.12 astroquery astropy pandas
+```
+
 ## Build Patches and Justifications
 
 To ensure stability and compatibility in a Conda environment, several patches are applied to the eSASS source code during the build:
@@ -41,18 +59,31 @@ To ensure stability, scientific accuracy, and compatibility in a Conda environme
 ### HEALPix Integer ABI (32-bit vs 64-bit)
 In `recipe/build.sh`, we explicitly **avoid** forcing the `-fdefault-integer-8` flag during the HEALPix build. While the "official" eSASS Makefile sometimes defines this flag, our analysis showed that it is not consistently applied to the core routines eSASS interfaces with. Keeping HEALPix at the standard 32-bit integer size ensures a stable ABI match with eSASS, HEASoft, and other standard Conda libraries, preventing the memory mangling issues observed in early GitHub Action build attempts.
 
-## Notes to self
 
-The conda environment I made for building is `rattler-conda-build`
+## Local build notes
 
-Need to increase the file limit for the build to work:
+### File limit
+
+You may need to increase the file limit for the build to work:
 
 ```bash
 ulimit -n 16000
 ```
 
+### Local build conda environment
 
-In theory the build process is triggered (from here) by:
+We use rattler-build to create this conda package - the environment can be created by:
+
+```bash
+conda create -n rattler-conda-build rattler-build rattler-index
+```
+
+### Local build examples
+
+The following are examples of how local builds with different configurations are triggered from the top level of this repository's file structure.
+
+
+This uses the latest (**6.36** as of the time of writing) version of HEASoft, and allows rattler-build to solve the build environment's dependencies itself (which will likely fetch the latest versions of compilers for your platform):
 
 ```bash
 cd recipe
@@ -60,10 +91,26 @@ cd recipe
 rattler-build build \
   --recipe recipe.yaml \
   -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ \
-  -c conda-forge 
+  -c conda-forge \
+  --variant heasoft_version="6.36.*" \
+  --keep-build
 ```
 
-OR WITH DEBUG ON (WILL DEFINITELY NEED) - this leaves the temporary build directory intact:
+Here we show an example that **also** uses HEASoft 6.36, but manually sets versions for the C, C++, and Fortran compilers (this example is specifically for ARM-based MacOS, so the C and C++ compiler versions correspond to Clang versions).
+
+```bash
+rattler-build build \
+  --recipe recipe.yaml \
+  -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ \
+  -c conda-forge \
+  --variant heasoft_version="6.36.*" \
+  --variant c_compiler_version="22.*" \
+  --variant cxx_compiler_version="22.*" \
+  --variant fortran_compiler_version="15.*" \
+  --keep-build
+```
+
+The same process as above, but building against HEASoft 6.35.2, with adjusted compiler versions to ensure compatibility:
 
 ```bash
 cd recipe
@@ -80,25 +127,5 @@ rattler-build build \
 ```
 
 
-```bash
-cd recipe
 
-rattler-build build \
-  --recipe recipe.yaml \
-  -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ \
-  -c conda-forge \
-  --variant heasoft_version="6.36.*" \
-  --keep-build
-```
 
-```bash
-rattler-build build \
-  --recipe recipe.yaml \
-  -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ \
-  -c conda-forge \
-  --variant heasoft_version="6.36.*" \
-  --variant c_compiler_version="22.*" \
-  --variant cxx_compiler_version="22.*" \
-  --variant fortran_compiler_version="15.*" \
-  --keep-build
-```
