@@ -96,7 +96,6 @@ sed -e "s|^F90_FC.*$|F90_FC = $F90_FC|" \
     -e "s|^F90_MODDIR[[:space:]=].*$|F90_MODDIR = \"$F90_MODDIR\"|" \
     -e "s|^F90_MOD[[:space:]=].*$|F90_MOD = mod|" \
     -e "s|^F90_OS.*$|F90_OS = $F90_OS|" \
-    -e "s|^F90_I8FLAG.*$|F90_I8FLAG = -fdefault-integer-8|" \
     -e "s|^F90_LIBSUFFIX.*$|F90_LIBSUFFIX = .a|" \
     -e "s|^ALL\(.*\) f90-void\(.*\)|ALL\1 f90-all\2|" \
     -e "s|^TESTS\(.*\) f90-void\(.*\)|TESTS\1 f90-test\2|" \

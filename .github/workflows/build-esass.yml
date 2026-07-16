@@ -239,6 +239,8 @@ jobs:
           name: ${{ matrix.target-platform }}_esass4dr1-${{ env.ESASS_VERSION }}-heasoft${{ steps.format_name.outputs.heasoft_name }}
           path: raw_artifacts
           workflow: build-esass.yml
+          run_id: ${{ github.run_id }}
+          check_artifacts: true
           search_artifacts: true
 
       - name: Setup Micromamba

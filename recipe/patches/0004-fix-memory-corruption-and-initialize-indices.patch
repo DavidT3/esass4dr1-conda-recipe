@@ -1,0 +1,24 @@
+--- eSASS/erosita/task/shapelib/slib_calc_space_mod.f90
++++ eSASS/erosita/task/shapelib/slib_calc_space_mod.f90
+@@ -255,7 +255,7 @@
+     ! relate to heal
+     integer ipix, nlist, ipix_running
+     double precision search_radius_rad
+-    integer, dimension(10000) :: listpix
++    integer, dimension(50000) :: listpix
+ 
+ 
+ !    write(*,*) "**** START slib_assign_heal"
+--- eSASS/erosita/task/shapelib/slib_data_evt_mod.f90
++++ eSASS/erosita/task/shapelib/slib_data_evt_mod.f90
+@@ -118,8 +118,8 @@
+     allocate  ( myEVENTFILE%EVENT%INDEX1(0:var) )
+     allocate  ( myEVENTFILE%EVENT%INDEX2(0:var) )
+     !  initialize (GL 13/04/2021):
+-!    myEVENTFILE%EVENT%INDEX1(:)=0
+-!    myEVENTFILE%EVENT%INDEX2(:)=0
++    myEVENTFILE%EVENT%INDEX1(:)=0
++    myEVENTFILE%EVENT%INDEX2(:)=0
+     
+ 
+     

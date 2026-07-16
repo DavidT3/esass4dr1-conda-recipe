@@ -14,6 +14,7 @@ source:
     - patches/0001-fix-macos-paths-and-static-linking.patch
     - patches/0002-fix-caldb-makefile-syntax.patch
     - patches/0003-modify-esass-init-scripts.patch
+    - patches/0004-fix-memory-corruption-and-initialize-indices.patch
 
 build:
   number: 0
