@@ -21,6 +21,7 @@ on:
           - All
           - "6.35.*"
           - "6.36.*"
+          - "6.37.*"
         default: All
       target_platform:
         description: 'eSASS build/test target platform'
@@ -58,6 +59,14 @@ jobs:
             cxx-compiler-version: "15.*"
             fortran-compiler-version: "15.2.*"
 
+          - os: ubuntu-latest
+            target-platform: linux-64
+            heasoft: "6.37.*"
+            # GCC version
+            c-compiler-version: "16.*"
+            cxx-compiler-version: "16.*"
+            fortran-compiler-version: "16.1.*"
+
 
           # MacOS ARM builds (macos-latest is ARM64)
           - os: macos-latest
@@ -76,6 +85,14 @@ jobs:
             cxx-compiler-version: "22.*"
             fortran-compiler-version: "15.*"
 
+          - os: macos-latest
+            target-platform: osx-arm64
+            heasoft: "6.37.*"
+            # clang versions and gfortran version
+            c-compiler-version: "22.*"
+            cxx-compiler-version: "22.*"
+            fortran-compiler-version: "16.*"
+
 
           # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
           - os: macos-26-intel
@@ -93,6 +110,14 @@ jobs:
             c-compiler-version: "22.*"
             cxx-compiler-version: "22.*"
             fortran-compiler-version: "15.*"
+
+          - os: macos-26-intel
+            target-platform: osx-64
+            heasoft: "6.37.*"
+            # clang versions and gfortran version
+            c-compiler-version: "22.*"
+            cxx-compiler-version: "22.*"
+            fortran-compiler-version: "16.*"
 
     steps:
       - name: Checkout code
@@ -193,6 +218,10 @@ jobs:
           - os: ubuntu-latest
             target-platform: linux-64
             heasoft: "6.36.*"
+          
+          - os: ubuntu-latest
+            target-platform: linux-64
+            heasoft: "6.37.*"
 
 
           # MacOS ARM builds (macos-latest is ARM64)
@@ -204,6 +233,10 @@ jobs:
             target-platform: osx-arm64
             heasoft: "6.36.*"
 
+          - os: macos-latest
+            target-platform: osx-arm64
+            heasoft: "6.37.*"
+
 
           # MacOS Intel builds (using macos-26-intel, the latest and last Intel version)
           - os: macos-26-intel
@@ -213,6 +246,10 @@ jobs:
           - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.36.*"
+
+          - os: macos-26-intel
+            target-platform: osx-64
+            heasoft: "6.37.*"
 
     steps:
       - name: Checkout code
