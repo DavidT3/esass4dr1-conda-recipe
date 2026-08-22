@@ -17,6 +17,7 @@ on:
           - All
           - "6.35.*"
           - "6.36.*"
+          - "6.37.*"
         default: All
       target_platform:
         description: 'eSASS build/test target platform'
@@ -52,6 +53,10 @@ jobs:
             target-platform: linux-64
             heasoft: "6.36.*"
 
+          - os: ubuntu-latest
+            target-platform: linux-64
+            heasoft: "6.37.*"
+
 
           # For the packages built for MacOS ARM
           - os: macos-latest
@@ -61,6 +66,10 @@ jobs:
           - os: macos-latest
             target-platform: osx-arm64
             heasoft: "6.36.*"
+          
+          - os: macos-latest
+            target-platform: osx-arm64
+            heasoft: "6.37.*"
 
 
           # For the packages built for MacOS Intel
@@ -71,6 +80,10 @@ jobs:
           - os: macos-26-intel
             target-platform: osx-64
             heasoft: "6.36.*"
+
+          - os: macos-26-intel
+            target-platform: osx-64
+            heasoft: "6.37.*"
 
     steps:
       - name: Checkout code
