@@ -1,6 +1,6 @@
 # Conda package for eSASS4DR1
 
-This repository contains a Conda recipe for eROSITA's eSASSDR1 software. It supports multiple HEASoft versions (6.35.* and 6.36.*) and architectures (Linux-64, macOS-ARM64, macOS-64).
+This repository contains a Conda recipe for eROSITA's eSASSDR1 software. It supports multiple HEASoft versions (6.35.*, 6.36.*, 6.36.*) and architectures (Linux-64, macOS-ARM64, macOS-64).
 
 ## How to install eSASS4DR1 through Conda
 
@@ -83,7 +83,7 @@ conda create -n rattler-conda-build rattler-build rattler-index
 The following are examples of how local builds with different configurations are triggered from the top level of this repository's file structure.
 
 
-This uses the latest (**6.36** as of the time of writing) version of HEASoft, and allows rattler-build to solve the build environment's dependencies itself (which will likely fetch the latest versions of compilers for your platform):
+This uses the latest (**6.37** as of the time of writing) version of HEASoft, and allows rattler-build to solve the build environment's dependencies itself (which will likely fetch the latest versions of compilers for your platform):
 
 ```bash
 cd recipe
@@ -92,21 +92,21 @@ rattler-build build \
   --recipe recipe.yaml \
   -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ \
   -c conda-forge \
-  --variant heasoft_version="6.36.*" \
+  --variant heasoft_version="6.37.*" \
   --keep-build
 ```
 
-Here we show an example that **also** uses HEASoft 6.36, but manually sets versions for the C, C++, and Fortran compilers (this example is specifically for ARM-based MacOS, so the C and C++ compiler versions correspond to Clang versions).
+Here we show an example that **also** uses HEASoft 6.37, but manually sets versions for the C, C++, and Fortran compilers (this example is specifically for ARM-based MacOS, so the C and C++ compiler versions correspond to Clang versions).
 
 ```bash
 rattler-build build \
   --recipe recipe.yaml \
   -c https://heasarc.gsfc.nasa.gov/FTP/software/conda/ \
   -c conda-forge \
-  --variant heasoft_version="6.36.*" \
+  --variant heasoft_version="6.37.*" \
   --variant c_compiler_version="22.*" \
   --variant cxx_compiler_version="22.*" \
-  --variant fortran_compiler_version="15.*" \
+  --variant fortran_compiler_version="16.*" \
   --keep-build
 ```
 
