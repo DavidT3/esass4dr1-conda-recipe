@@ -1,0 +1,12 @@
+--- eSASS/erosita/task/srctool/srctool_spec_mod.f90
++++ eSASS/erosita/task/srctool/srctool_spec_mod.f90
+@@ -798,5 +798,9 @@
+
+     !-----------------------------------
+     ! write the standard keywords to the binary table HDU:
++    write(*,*) "DIAGNOSTIC: TELAPSE=", spec%key_telapse%value
++    write(*,*) "DIAGNOSTIC: ONTIME=", spec%key_ontime%value
++    write(*,*) "DIAGNOSTIC: LIVETIME=", spec%key_livetime%value
++    write(*,*) "DIAGNOSTIC: EXPOSURE=", spec%key_exposure%value
+     call fitswrap_write_hduinfo_quiet(unit, spec%hduinfo, ierr)
+     if (ierr .ne. ERROR_LEVEL_OK) then
