@@ -15,6 +15,7 @@ source:
     - patches/0002-fix-caldb-makefile-syntax.patch
     - patches/0003-modify-esass-init-scripts.patch
     - patches/0004-fix-memory-corruption-and-initialize-indices.patch
+    - patches/0005-handle-nan-header-keywords.patch
 
 build:
   number: 0

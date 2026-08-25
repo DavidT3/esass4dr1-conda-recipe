@@ -1,0 +1,36 @@
+--- eSASS/erosita/task/srctool/srctool_generic_fitswrap_mod.f90
++++ eSASS/erosita/task/srctool/srctool_generic_fitswrap_mod.f90
+@@ -28,6 +28,7 @@
+   use param           ! standard eRosita module handling parameter/logging/error interface
+
+   use srctool_generic  ! generic module with some universal constants
++  use ieee_arithmetic  ! for ieee_is_nan
+   use srctool_generic_fitsraw
+
+   implicit none     ! insist on explicit typing
+@@ -3105,7 +3106,11 @@
+       end if
+     ! write the key to the file
+     else if ( fitskey%flag .eq. FITSWRAP_KEY_FLAG_SUPPLIED ) then
+-      call FTPKYE_w(unit,trim(fitskey%name),fitskey%value,FITSIO_DECIMALS,trim(fitskey%comment), status)
++      if (ieee_is_nan(fitskey%value)) then
++        call FTPKYU_w(unit,trim(fitskey%name),trim(fitskey%comment), status)
++      else
++        call FTPKYE_w(unit,trim(fitskey%name),fitskey%value,FITSIO_DECIMALS,trim(fitskey%comment), status)
++      end if
+       if  ( status .ne. 0 ) then ! there must be some other kind of fitsio error
+         ierr = ERROR_LEVEL_SEVERE
+         call fitswrap_write_fits_error(subroutinename, status)
+@@ -3146,7 +3151,11 @@
+       end if
+     ! write the key to the file
+     else if ( fitskey%flag .eq. FITSWRAP_KEY_FLAG_SUPPLIED ) then
+-      call FTPKYD_w(unit,trim(fitskey%name),fitskey%value,FITSIO_DECIMALS,trim(fitskey%comment), status)
++      if (ieee_is_nan(fitskey%value)) then
++        call FTPKYU_w(unit,trim(fitskey%name),trim(fitskey%comment), status)
++      else
++        call FTPKYD_w(unit,trim(fitskey%name),fitskey%value,FITSIO_DECIMALS,trim(fitskey%comment), status)
++      end if
+       if  ( status .ne. 0 ) then ! there must be some other kind of fitsio error
+         ierr = ERROR_LEVEL_SEVERE
+         call wrserr(subroutinename,ierr,"Problem writing key: " //  trim(fitskey%name))
