@@ -8,7 +8,7 @@
    use srctool_generic_fitsraw
 
    implicit none     ! insist on explicit typing
-@@ -3105,7 +3106,7 @@
+@@ -3105,7 +3106,11 @@
        end if
      ! write the key to the file
      else if ( fitskey%flag .eq. FITSWRAP_KEY_FLAG_SUPPLIED ) then
@@ -21,7 +21,7 @@
        if  ( status .ne. 0 ) then ! there must be some other kind of fitsio error
          ierr = ERROR_LEVEL_SEVERE
          call fitswrap_write_fits_error(subroutinename, status)
-@@ -3146,7 +3147,11 @@
+@@ -3146,7 +3151,11 @@
        end if
      ! write the key to the file
      else if ( fitskey%flag .eq. FITSWRAP_KEY_FLAG_SUPPLIED ) then
@@ -34,15 +34,3 @@
        if  ( status .ne. 0 ) then ! there must be some other kind of fitsio error
          ierr = ERROR_LEVEL_SEVERE
          call wrserr(subroutinename,ierr,"Problem writing key: " //  trim(fitskey%name))
---- eSASS/erosita/task/srctool/srctool_spec_mod.f90
-+++ eSASS/erosita/task/srctool/srctool_spec_mod.f90
-@@ -798,5 +798,9 @@
-
-     !-----------------------------------
-     ! write the standard keywords to the binary table HDU:
-+    write(*,*) "DIAGNOSTIC: TELAPSE=", spec%key_telapse%value
-+    write(*,*) "DIAGNOSTIC: ONTIME=", spec%key_ontime%value
-+    write(*,*) "DIAGNOSTIC: LIVETIME=", spec%key_livetime%value
-+    write(*,*) "DIAGNOSTIC: EXPOSURE=", spec%key_exposure%value
-     call fitswrap_write_hduinfo_quiet(unit, spec%hduinfo, ierr)
-     if (ierr .ne. ERROR_LEVEL_OK) then
