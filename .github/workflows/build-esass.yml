@@ -350,3 +350,19 @@ jobs:
           export SASS_CALVERS=$CALDB/data/erosita/calvers.indx
           mkdir -p outputs
           python $CONDA_PREFIX/eSASS4DR1/eSASS/scripts/demoscript_DR1.py /tmp/d/events/em01_053141_020_EventList_c010.fits outputs/
+
+      - name: Run flaregti Test
+        if: |
+          (github.event.inputs.heasoft_version == 'All' || matrix.heasoft == github.event.inputs.heasoft_version) &&
+          (github.event.inputs.target_platform == 'All' || matrix['target-platform'] == github.event.inputs.target_platform)
+        shell: bash -l {0}
+        run: |
+          export CALDB=/tmp/d/caldb4DR1
+          export CALDBCONFIG=$CALDB/software/tools/caldb.config
+          export CALDBALIAS=$CALDB/software/tools/alias_config.fits
+          export SASS_CALVERS=$CALDB/data/erosita/calvers.indx
+          # Use the same input file as the demo script
+          INPUT_EVT=/tmp/d/events/em01_053141_020_EventList_c010.fits
+          mkdir -p flaregti_outputs
+          echo "Testing flaregti with $INPUT_EVT..."
+          flaregti efile=$INPUT_EVT gtifile=flaregti_outputs/flare_gti.fits tbin=100 fthresh=0.0

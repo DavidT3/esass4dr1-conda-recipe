@@ -1,0 +1,8 @@
+--- eSASS/autoconf/task/flaregti/flaregti_main.f90
++++ eSASS/autoconf/task/flaregti/flaregti_main.f90
+@@ -143,3 +143,3 @@
+   ! detection uses the GTI from the previous iteration
+   do isrcdet = 1, pars%mask_iter
+-     write(line, '(A26I3)') "Source detection iteration", isrcdet
++     write(line, '(A26, I3)') "Source detection iteration", isrcdet
+      call wrlog("flaregti_main", line)
