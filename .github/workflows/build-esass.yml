@@ -365,4 +365,4 @@ jobs:
           INPUT_EVT=/tmp/d/events/em01_053141_020_EventList_c010.fits
           mkdir -p flaregti_outputs
           echo "Testing flaregti with $INPUT_EVT..."
-          flaregti efile=$INPUT_EVT gtifile=flaregti_outputs/flare_gti.fits tbin=100 fthresh=0.0
+          flaregti evtfiles=$INPUT_EVT gtifile=flaregti_outputs/flare_gti.fits
