@@ -361,8 +361,7 @@ jobs:
           export CALDBCONFIG=$CALDB/software/tools/caldb.config
           export CALDBALIAS=$CALDB/software/tools/alias_config.fits
           export SASS_CALVERS=$CALDB/data/erosita/calvers.indx
+          
           # Use the same input file as the demo script
-          INPUT_EVT=/tmp/d/events/em01_053141_020_EventList_c010.fits
-          mkdir -p flaregti_outputs
           echo "Testing flaregti with $INPUT_EVT..."
-          flaregti evtfiles=$INPUT_EVT gtifile=flaregti_outputs/flare_gti.fits
+          flaregti eventfile=/tmp/d/events/em01_053141_020_EventList_c010.fits gtifile=outputs/flare_gti.fits
