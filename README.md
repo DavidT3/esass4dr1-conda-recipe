@@ -1,6 +1,6 @@
 # Conda package for eSASS4DR1
 
-This repository contains a Conda recipe for eROSITA's eSASSDR1 software. It supports multiple HEASoft versions (6.35.*, 6.36.*, 6.36.*) and architectures (Linux-64, macOS-ARM64, macOS-64).
+This repository contains a Conda recipe for eROSITA's eSASSDR1 software. It supports multiple HEASoft versions (6.35.*, 6.36.*, 6.37.*) and architectures (Linux-64, macOS-ARM64, macOS-64).
 
 ## How to install eSASS4DR1 through Conda
 
